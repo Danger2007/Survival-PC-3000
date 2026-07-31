@@ -12,3 +12,4 @@ You can find the detailed cost breakdown, component list and buying links in my 
 The device runs on a **Raspberry Pi OS (Legacy 32-bit with Desktop)** on a Raspberry Pi Zero 2W and it uses some custom python scripts to interface with sensors, a touch screen and physical inputs (that stay true to the original model ).
 ## Important Information
 Some parts of the project are not mine, I took some scripts and 3D models online, in order to make my project as similar as possible to the  model that inspired it. All the elements I took online are listed in the [BOM.md](./BOM.md) file.
+Also I'll release the code in this repo when I'll complete a semi-complete PC version
