@@ -11,5 +11,6 @@ You can find the detailed cost breakdown, component list and buying links in my 
 ## Software
 The device runs on a **Raspberry Pi OS (Legacy 32-bit with Desktop)** on a Raspberry Pi Zero 2W and it uses some custom python scripts to interface with sensors, a touch screen and physical inputs (that stay true to the original model ).
 ## Important Information
-Some parts of the project are not mine, I took some scripts and 3D models online, in order to make my project as similar as possible to the  model that inspired it. All the elements I took online are listed in the [BOM.md](./BOM.md) file.
-Also I'll release the code in this repo when I'll complete a semi-complete PC version
+1) Some parts of the project are not mine, I took some scripts and 3D models online, in order to make my project as similar as possible to the  model that inspired it. All the elements I took online are listed in the [BOM.md](./BOM.md) file.
+2) I'll release the code in this repo when I'll complete a semi-complete PC version
+3) The Solar Panel Add-on will NOT be implemented in the survival-pc 3000 (becase I'm lacking the time to make the 3D model for a support)
