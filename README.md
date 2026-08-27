@@ -1,6 +1,9 @@
 # Survival-PC-3000 
 An open-source post-apocalyptic forearm PC inspired by the Pip-Boy from Fallout New Vegas.
-![Photo of 3D Model](Screenshots/Screenshot 2026-07-14 160910.png)
+
+<img width="717" height="467" alt="image" src="https://github.com/user-attachments/assets/46e5624c-05e2-4e9f-b137-e420c69d9e3c" />
+
+
 ## Features
 - **Radiation Monitoring:** Built-In Geiger counter to detect gamma and beta radiations so you know where you should NOT go
 - **Audio:** Integrated Mini-Speaker and Radio Module to feel the Nuclear Vibes
@@ -10,9 +13,12 @@ An open-source post-apocalyptic forearm PC inspired by the Pip-Boy from Fallout 
 ## Hardware & Bill of materials
 You can find the detailed cost breakdown, component list and buying links in my [BOM.md](./BOM.md) and [BOM.csv](./BOM.csv) files.
 ## Software
-The device runs a **Raspberry Pi OS (Legacy 32-bit with Desktop)** on a Raspberry Pi Zero 2W and it uses some custom python scripts to interface with sensors, a touch screen and physical inputs (that stay true to the original model ). The python scripts are built so as to remulate the Pip-boy Operating Systems from the games Fallout 4 and Fallout New Vegas; the Pip-Boy OS that you can find in the repo can also be personalized using the Configure.py that you can find in the [Pip-boy OS file](Software /Pip-Boy OS). To start the code you need to run [main.py]() in Python
-![Fallout 4 STATS](Screenshots/Screenshot 2026-08-27 130749.png)
-![Fallout New Vegas STATS](Screenshots/Screenshot 2026-08-27 130842.png)
+The device runs a **Raspberry Pi OS (Legacy 32-bit with Desktop)** on a Raspberry Pi Zero 2W and it uses some custom python scripts to interface with sensors, a touch screen and physical inputs (that stay true to the original model ). The python scripts are built so as to remulate the Pip-boy Operating Systems from the games Fallout 4 and Fallout New Vegas; the Pip-Boy OS that you can find in the repo can also be personalized using the Configure.py that you can find in the [Pip-boy OS file](Software /Pip-Boy OS). To start the code you need to run [main.py]() in Python, all the requirements are listed in the [requirements file](Software /Pip-Boy OS/requirements.txt).
+
+<img width="390" height="316" alt="Screenshot 2026-07-18 170426" src="https://github.com/user-attachments/assets/3f1b723f-4dd3-4424-a425-d9b1af67f751" />
+
+<img width="397" height="316" alt="Screenshot 2026-08-27 130842" src="https://github.com/user-attachments/assets/0c52e5ed-df51-482c-84d8-b31679faa2be" />
+
 ## Important Information
 1) Some parts of the project are not mine, I took some scripts and 3D models online, in order to make my project as similar as possible to the  model that inspired it. All the elements I took online are listed in the [BOM.md](./BOM.md) file.
 2) I'll release the code in this repo when I'll complete a semi-complete PC version
