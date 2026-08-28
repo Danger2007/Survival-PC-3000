@@ -11,7 +11,7 @@ An open-source post-apocalyptic forearm PC inspired by the Pip-Boy from Fallout 
 - **Reinforced structure:** M2 and M3 screws with some glue and neodimium magnets will make this Pip-Boy indestructable
 - **Compatibility:** with a Usb-c port for charging, a Usb port for inputs (ex: Mouse or Keyboard), and a HDMI integrated cable for screen mirroring, you can always connect with older and newer technologies alike
 ## Hardware & Bill of materials
-You can find the detailed cost breakdown, component list and buying links in my [BOM.md](./BOM.md) and [BOM.csv](./BOM.csv) files (shipping prices included). The wiring schematics are situated in the [Schematics Folder](Schematics/).
+You can find the detailed cost breakdown, component list and buying links in my [BOM.md](./BOM.md) and [BOM.csv](./BOM.csv) files (shipping prices included). The wiring schematics are situated in the [Schematics Folder](Schematics/). **ATTENTION: the schematics only shows the connections that need to be soldered**, that's why in the top-right area of the schematics there are 2 Isolated components (USB port and Micro USB) which are soldered so as to form a cable that connects to the Raspberry via Micro USB, that's also why there is no MiniHDMI to HDMI cable, which also connects to the Raspberry using its MiniHDMI port.
 
 <img width="1169" height="828" alt="Schematic_Survival-PC-3000_2026-08-28" src="https://github.com/user-attachments/assets/d56d64b9-3732-40b0-b53e-235eac7d7f3e" />
 
