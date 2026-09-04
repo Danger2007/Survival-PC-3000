@@ -9,36 +9,66 @@ from util_functs import Utils
 
 
 class InvBase:
-    def __init__(self, screen, tab_instance, draw_space: pygame.Rect, category: str, enable_turntable: bool = True, enable_dot: bool = False):
+    def __init__(self, screen, tab_instance, draw_space: pygame.Rect, category, enable_turntable: bool = True, enable_dot: bool = False):
         self.screen = screen
         self.tab_instance = tab_instance
         self.draw_space = draw_space
         self.enable_turntable = enable_turntable
         
-        # Normalizza la categoria (es. "AMMO" -> "Ammo", "MISC" -> "Misc") per renderla dinamica tra stili
-        self.category = category.strip().title() if isinstance(category, str) else category
+        # Normalizzazione: supporta sia stringa singola che tuple/liste di categorie
+        if isinstance(category, (list, tuple)):
+            self.category = [c.strip().title() for c in category if isinstance(c, str)]
+        elif isinstance(category, str):
+            self.category = category.strip().title()
+        else:
+            self.category = category
         
-        # Cache per memorizzare i frame dell'animazione caricati in memoria o i fallback
+        # Cache per memorizzare i frame dell'animazione
         self._anim_cache = {}
         
         self.inv_font = pygame.font.Font(settings.ROBOTO_BOLD_PATH, 10)
         self.footer_font = tab_instance.footer_font              
         inventory = Inventory()
-        self.inv_items = inventory.get_all_items(self.category)
+        
+        # Recupero oggetti da una o più categorie
+        if isinstance(self.category, (list, tuple)):
+            self.inv_items = []
+            combined_pairs = []
+            for cat in self.category:
+                self.inv_items.extend(inventory.get_all_items(cat))
+                u_items = inventory.get_unique_items(cat)
+                names = inventory.get_item_names(cat)
+                for item, name in zip(u_items, names):
+                    combined_pairs.append((item, name))
+            
+            # Ordina alfabeticamente per nome dell'oggetto
+            combined_pairs.sort(key=lambda pair: getattr(pair[0], 'name', '').lower())
+            self.unique_items = [p[0] for p in combined_pairs]
+            item_names = [p[1] for p in combined_pairs]
+        else:
+            self.inv_items = inventory.get_all_items(self.category)
+            self.unique_items = inventory.get_unique_items(self.category) if self.inv_items else []
+            item_names = inventory.get_item_names(self.category) if self.inv_items else []
+
         self.weight = sum(item.weight for item in inventory.get_all_items())
         self._init_icons()
         
+        # Inizializzazione stati dell'inventario
         self.no_items = True if not self.inv_items else False
-        if self.no_items:
-            return
-                
         self.item_selected = False
         self.active_item_index = None
         self.previous_item_index = None
-        
-        self.unique_items = inventory.get_unique_items(self.category)
-        
-        item_names = inventory.get_item_names(self.category)
+
+        # Registrazione piè di pagina
+        self.tab_instance.init_footer(
+            self, 
+            (settings.SCREEN_WIDTH // 4, settings.SCREEN_WIDTH // 4), 
+            self.init_footer_text()
+        )
+
+        if self.no_items:
+            return
+
         self.list_draw_space = pygame.Rect(
             self.draw_space.left,
             self.draw_space.top + 2 * settings.LIST_TOP_MARGIN,
@@ -62,7 +92,7 @@ class InvBase:
         turntable_height = self.list_draw_space.height // 2
         self.turntable_draw_space = pygame.Rect(0, 0, turntable_width, turntable_height)
         self.turntable_draw_space.center = (center_x, self.draw_space.top + (turntable_height // 2))
-        self.turntable_lock = Lock
+        self.turntable_lock = Lock()
         self.item_turntable = None
 
     def _init_icons(self):
@@ -78,10 +108,6 @@ class InvBase:
         }        
 
     def _find_item_folder(self, item) -> str | None:
-        """
-        Cerca dinamicamente la cartella dell'oggetto scansionando l'intera directory
-        'images/inventory/' (incluse sottocartelle come items, armor, weapons, ecc.).
-        """
         current_dir = os.path.dirname(os.path.abspath(__file__))
         tabs_dir = os.path.dirname(current_dir)
         modules_dir = os.path.dirname(tabs_dir)
@@ -108,11 +134,6 @@ class InvBase:
         return None
 
     def _create_fallback_image(self) -> pygame.Surface:
-        """
-        Crea la superficie di fallback "IMAGE NOT FOUND":
-        - Stile Fallout_NV: Riquadro vuoto (bordo 2px) con testo PIP_BOY_LIGHT (Invariato).
-        - Stile Fallout_4: Riquadro pieno PIP_BOY_MIDDLE con testo PIP_BOY_LIGHT.
-        """
         w = max(20, self.turntable_draw_space.width + 10)
         h = max(20, self.turntable_draw_space.height - 50)
         
@@ -123,11 +144,9 @@ class InvBase:
         is_fo4 = ui_style == "Fallout_4"
 
         if is_fo4:
-            # Stile Fallout 4: Sfondo PIP_BOY_MIDDLE e testo PIP_BOY_LIGHT
             surf.fill(color_middle)
             text_surf = self.inv_font.render("IMAGE NOT FOUND", True, (0,0,0))
         else:
-            # Stile New Vegas: Riquadro vuoto con bordo e testo PIP_BOY_LIGHT
             pygame.draw.rect(surf, color_light, surf.get_rect(), width=1)
             text_surf = self.inv_font.render("IMAGE NOT FOUND", True, color_light)
 
@@ -153,6 +172,16 @@ class InvBase:
         if self.enable_turntable and self.inv_list.selected_index != prev_index:
             Thread(target=self.start_item_animation).start() 
         
+    def init_footer_text(self):
+        weight_surface = self.init_footer_weight()
+        caps_surface = self.init_footer_caps()
+        
+        footer_surface = pygame.Surface((settings.SCREEN_WIDTH, settings.BOTTOM_BAR_HEIGHT), pygame.SRCALPHA).convert_alpha()
+        footer_surface.blit(weight_surface, (0, 0))
+        footer_surface.blit(caps_surface, (0, 0))
+        
+        return footer_surface
+
     def init_footer_weight(self):
         weight_text = f"{self.weight}/{settings.MAX_CARRY_WEIGHT}"
         weight_surface = self.footer_font.render(weight_text, True, settings.PIP_BOY_LIGHT)
@@ -186,7 +215,6 @@ class InvBase:
         selected_item = self.unique_items[self.inv_list.selected_index]   
         item_key = selected_item.name
 
-        # Verifica prima la cache
         if item_key in self._anim_cache:
             icons = self._anim_cache[item_key]
         else:
@@ -203,10 +231,8 @@ class InvBase:
                     elif isinstance(loaded, list):
                         icons = loaded
 
-                    # Ridimensiona solo le immagini reali caricate da disco
                     icons = [Utils.scale_image_abs(img, height=self.turntable_draw_space.height) for img in icons if img]
 
-            # Se non sono state trovate immagini valide su disco, genera il riquadro di fallback
             if not icons:
                 icons = [self._create_fallback_image()]
 
@@ -246,7 +272,6 @@ class InvBase:
         self.item_turntable.start()
 
     def handle_threads(self, tab_selected: bool):
-        """ Handle the threads"""
         if self.no_items:
             return
         if tab_selected and self.enable_turntable:

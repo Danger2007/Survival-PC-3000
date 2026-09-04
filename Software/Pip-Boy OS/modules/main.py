@@ -9,7 +9,6 @@ from input_manager import InputManager
 import boot
 
 
-
 def main():
     """Main entry point for the Pip-Boy application."""
     if settings.RASPI:

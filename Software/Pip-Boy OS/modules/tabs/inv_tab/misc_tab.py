@@ -3,85 +3,68 @@ import settings
 from .inv_base import InvBase
 from ui import ItemGrid
 
+
 class MiscTab(InvBase):
     def __init__(self, screen, tab_instance, draw_space):
-        super().__init__(screen, tab_instance, draw_space, category='Misc', enable_turntable=True)
+        # Determina le categorie da raggruppare in base al layout attivo
+        ui_style = str(getattr(settings, 'UI_STYLE', '')).lower()
+        is_nv = ui_style == 'fallout_nv'
+        category = ('Misc', 'Junk', 'Mods') if is_nv else 'Misc'
         
-        self.tab_instance.init_footer(
-            self, 
-            (settings.SCREEN_WIDTH // 4, settings.SCREEN_WIDTH // 4), 
-            self.init_footer_text()
-        )
-        
+        super().__init__(screen, tab_instance, draw_space, category=category, enable_turntable=True)
+        self.item_grid = None
+
         if self.no_items:
             return
             
-        # Initialize the item grid.
         self.item_grid = ItemGrid(
             draw_space=self.calculate_grid_space(),
             font=self.inv_font,
             padding=1
         )
         
-        
-        # Prepare and update grid entries for the initially selected junk item.
-        entries = self.get_grid_entries(self.inv_items[self.inv_list.selected_index])
-        self.item_grid.update(entries)
+        if self.unique_items and 0 <= self.inv_list.selected_index < len(self.unique_items):
+            entries = self.get_grid_entries(self.unique_items[self.inv_list.selected_index])
+            self.item_grid.update(entries)
         
     def init_footer_text(self):
-        """
-        Combine multiple footer components (weight and components) into one footer surface.
-        """
-        weight_surface = self.init_footer_weight()  # Assumed to be defined in InvBase or elsewhere.
-        defense_surface = self.init_footer_caps()
+        weight_surface = self.init_footer_weight()
+        caps_surface = self.init_footer_caps()
         
         footer_surface = pygame.Surface((settings.SCREEN_WIDTH, settings.BOTTOM_BAR_HEIGHT), pygame.SRCALPHA).convert_alpha()
         footer_surface.blit(weight_surface, (0, 0))
-        footer_surface.blit(defense_surface, (0, 0))
+        footer_surface.blit(caps_surface, (0, 0))
         
         return footer_surface
 
     def calculate_grid_space(self):
         return super().calculate_grid_space()
-    
-    #OG grid calculation
-    """"
-    def calculate_grid_space(self):
-        #Calculate the space available for the item grid.
-        list_space = self.list_draw_space
-        return pygame.Rect(
-            list_space.right + settings.GRID_LEFT_MARGIN,  # Horizontal spacing from list.
-            list_space.top,                                  # Align top with the list.
-            self.draw_space.width - list_space.width - (settings.GRID_RIGHT_MARGIN // 3),  # Use remaining width.
-            list_space.height                                # Match the list's height.
-        )
-    """
+
     def get_grid_entries(self, item):
         entries = []
             
-        # Add standard entries (e.g., weight and value).
         standard = [
-            ("Weight", item.weight),
-            ("Value", item.value)
+            ("Weight", getattr(item, 'weight', 0)),
+            ("Value", getattr(item, 'value', 0))
         ]
         for label, value in standard:
             entries.append({"label": label, "value": value})
             
         return entries
 
-
     def scroll(self, direction: bool):
-        if self.no_items:
+        if self.no_items or self.item_grid is None:
             return
+            
         prev_index = self.inv_list.selected_index
         super().scroll(direction)
-        if prev_index != self.inv_list.selected_index:
+        
+        if prev_index != self.inv_list.selected_index and self.unique_items and 0 <= self.inv_list.selected_index < len(self.unique_items):
             entries = self.get_grid_entries(self.unique_items[self.inv_list.selected_index])
             self.item_grid.update(entries)
-            
 
     def render(self):
         super().render()
-        if self.no_items:
+        if self.no_items or self.item_grid is None:
             return
         self.item_grid.render(self.screen)

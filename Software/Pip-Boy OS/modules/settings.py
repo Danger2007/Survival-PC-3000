@@ -2,7 +2,13 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 from data_models import LimbPosition, IconConfig
 from items import ItemLoader, Inventory
-from settings_secrets import *
+
+# Import sicuro delle chiavi segrete per evitare crash se il file non esiste
+try:
+    from settings_secrets import *
+except ImportError:
+    pass
+
 import platform
 
 #######################################################
@@ -20,8 +26,7 @@ UI_STYLE = "Fallout_4"
 if UI_STYLE == "Fallout_NV":
     SUBTABS = {
         'STATS': ['STATUS', 'S.P.E.C.I.A.L.', 'SKILLS', 'PERKS', 'GENERAL'],
-        "ITEMS"
-        "": ("WEAPONS", "APPAREL", "AID", "MISC", "AMMO"),
+        "ITEMS": ("WEAPONS", "APPAREL", "AID", "MISC", "AMMO"),
         "DATA": ("QUESTS", "LOCAL MAP", "WORLD MAP", "NOTES", "RADIO")
     }
 else:
@@ -35,7 +40,6 @@ else:
 # User Configuration (Adjust these for setup/preferences)
 # ==================================================
 
-
 # ------------------
 # UI Layout
 # ------------------
@@ -43,7 +47,7 @@ UI_STYLE = "Fallout_4"
 TAB_MARGIN = 20
 TAB_VERTICAL_OFFSET = 0
 TAB_VERTICAL_LINE_OFFSET = 10
-TAB_HORIZONTAL_LINE_OFFSET =4
+TAB_HORIZONTAL_LINE_OFFSET = 4
 TAB_SCREEN_EDGE_LENGTH = 2
 TAB_HORIZONTAL_LENGTH = TAB_HORIZONTAL_LINE_OFFSET // 1.1
 TAB_BOTTOM_MARGIN = 2
@@ -58,7 +62,6 @@ LIST_TOP_MARGIN = 10
 # ------------------
 # General Settings
 # ------------------
-
 RASPI = False 
 SPEED = 1
 GAME_ACCURATE_MODE = False
@@ -113,7 +116,6 @@ RANDOM_GLITCH_CHANCE = 0.5
 # ------------------
 from paths import *
 
-
 # ------------------
 # Player Settings
 # ------------------
@@ -157,12 +159,15 @@ _inventory.add_item(items['Fusion Cell'], 25)
 _inventory.add_item(items['10mm Round'], 37)
 _inventory.add_item(items['Mini Nuke'])
 
+# Esportazione lista base per le schede dell'inventario
+INV_BASE = _inventory.get_all_items()
 
-
+# Calcolo dei bonus S.P.E.C.I.A.L.
+SPECIAL_KEYS = ['STR', 'PER', 'END', 'CHR', 'INT', 'AGI', 'LUK']
 for item in _inventory.get_all_items():
-    for i in range(7):
-        if "special_bonus" in item.__dict__:
-            SPECIAL_STATS_BONUS[i] += item.special_bonus[i]
+    if hasattr(item, 'special_bonuses') and isinstance(item.special_bonuses, dict):
+        for i, stat_key in enumerate(SPECIAL_KEYS):
+            SPECIAL_STATS_BONUS[i] += item.special_bonuses.get(stat_key, 0)
 
 MAX_WEIGHT = 200 + (DEFAULT_SPECIAL_STATS[0] * 10)
 CAPS = 1000
@@ -209,30 +214,31 @@ SPECIAL_DESCRIPTIONS = [
     "Agility is a measure of your overall fitnesse and reflexes. It affects the number of Action Points in V.A.T.S. and your ability to sneak",
     "Luck is a measure of your general good fortune, and affects the recharge rate of Critical Hits, and the chances of finding better items."
 ]
+
 # Perks subtab
 DEFAULT_PERKS_NV = [
-        #{"name": "Black Widow", "rank": 1, "max_rank": 1, "desc": "In combat, you do +10% damage against male opponents. Outside of combat, you'll sometimes have access to unique dialogue options when dealing with the opposite sex."},
-        {"name": "Lady Killer", "rank": 1, "max_rank": 1, "desc": "In combat, you do +10% damage against female opponents. Outside of combat, you'll sometimes have access to unique dialogue options when dealing with the opposite sex."},
-        {"name": "Mysterious Stranger", "rank": 1, "max_rank": 1, "desc": "Gives you your own personal guardian angel... armed with a fully loaded .44 Magnum. With this perk, the Mysterious Stranger appears occasionally in V.A.T.S. mode to lend a hand, with deadly efficiency."},
-        {"name": "Commando", "rank": 1, "max_rank": 3, "desc": "While using a rifle (or similar two-handed weapon), your accuracy in V.A.T.S. is significantly increased."},
-        {"name": "Cowboy", "rank": 1, "max_rank": 3, "desc": "You do 25% more damage when using any revolver, lever-action firearm, dynamite, knife, or hatchet."},
-        {"name": "Four Eyes", "rank": 1, "max_rank": 1, "desc": "While wearing any type of glasses, you have +1 PER. Without glasses, you have -1 PER."},
-        {"name": "Good Natured", "rank": 1, "max_rank": 1, "desc": "You're Good Natured at heart, more prone to solving problems with your mind than violence. You gain +5 to Barter, Medicine, Repair, Science, and Speech, but have -5 to Energy Weapons, Explosives, Guns, Melee Weapons, and Unarmed."},
-        {"name": "Computer Whiz", "rank": 1, "max_rank": 1, "desc": "Fail a hack attempt and get locked out of a computer? Not if you're a computer whiz! With this perk, you get a second chance at any computer you were previously locked out of."},
-    ]
+    {"name": "Lady Killer", "rank": 1, "max_rank": 1, "desc": "In combat, you do +10% damage against female opponents. Outside of combat, you'll sometimes have access to unique dialogue options when dealing with the opposite sex."},
+    {"name": "Mysterious Stranger", "rank": 1, "max_rank": 1, "desc": "Gives you your own personal guardian angel... armed with a fully loaded .44 Magnum. With this perk, the Mysterious Stranger appears occasionally in V.A.T.S. mode to lend a hand, with deadly efficiency."},
+    {"name": "Commando", "rank": 1, "max_rank": 3, "desc": "While using a rifle (or similar two-handed weapon), your accuracy in V.A.T.S. is significantly increased."},
+    {"name": "Cowboy", "rank": 1, "max_rank": 3, "desc": "You do 25% more damage when using any revolver, lever-action firearm, dynamite, knife, or hatchet."},
+    {"name": "Four Eyes", "rank": 1, "max_rank": 1, "desc": "While wearing any type of glasses, you have +1 PER. Without glasses, you have -1 PER."},
+    {"name": "Good Natured", "rank": 1, "max_rank": 1, "desc": "You're Good Natured at heart, more prone to solving problems with your mind than violence. You gain +5 to Barter, Medicine, Repair, Science, and Speech, but have -5 to Energy Weapons, Explosives, Guns, Melee Weapons, and Unarmed."},
+    {"name": "Computer Whiz", "rank": 1, "max_rank": 1, "desc": "Fail a hack attempt and get locked out of a computer? Not if you're a computer whiz! With this perk, you get a second chance at any computer you were previously locked out of."},
+]
 DEFAULT_PERKS_FO4 = [
     {
         "name": "Black Widow",
-        "rank": 1,          # Grado sbloccato attuale (riempirà 2 stelle su 3)
-        "max_rank": 3,      # (Opzionale) numero totale di stelle
+        "rank": 1,          
+        "max_rank": 3,      
         "rank_descs": [
             "You're charming... and dangerous. Men suffer +5% damage in combat, and are easier to persuade in dialogue.",
             "Men now suffer +10% damage in combat, and are even easier to persuade in dialogue. They are also easier to pacify with the Intimidation perk.",
             "Men now suffer +15% damage in combat, and are much easier to persuade in dialogue. They are now even easier to pacify with the Intimidation perk."
         ]
     }
-    ]
-#Skills subtab
+]
+
+# Skills subtab
 DEFAULT_SKILLS = [
     {"name": "Barter", "value": 55, "mod": "+", "desc": "The Barter skill affects the prices you get for buying and selling items. In general, the higher your Barter skill, the lower your prices on purchased items."},
     {"name": "Energy Weapons", "value": 16, "mod": "", "desc": "The Energy Weapons skill determines your effectiveness with all energy-based weapons, including Laser Pistols and Plasma Rifles."},
@@ -248,6 +254,7 @@ DEFAULT_SKILLS = [
     {"name": "Unarmed", "value": 17, "mod": "", "desc": "The Unarmed skill is used for fighting without weapons, or with weapons designed specifically for hand-to-hand combat (e.g., Brass Knuckles, Boxing Gloves, Power Fists)."},
     {"name": "Survival", "value": 10, "mod": "", "desc": "The Survival skill allows you to create powerful poisons, chems, and consumable food and drink items at camp fires scattered around the wasteland as the skill is increased."}
 ]
+
 # ------------------
 # Inventory Tab Settings
 # ------------------
@@ -277,6 +284,7 @@ RADIO_WAVE_BATCH_SIZE = 5
 RADIO_WAVE_SMOOTHING_FACTOR = 0.05
 INTERMISSION_FREQUENCY = 50
 FM_RADIO = False
+
 # ------------------
 # Map Tab Settings
 # ------------------
@@ -325,7 +333,6 @@ OSM_KEYS = (
     "man_made",
     "amenity",
 )
-    
 
 MAP_TILE_SIZE = 512
 
@@ -333,7 +340,6 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 USER_CONFIG_PATH = os.path.join(CURRENT_DIR, 'user_config.py')
 if os.path.exists(USER_CONFIG_PATH):
     from user_config import *
-    
 
 GEOAPIFY_KEY = 'YOUR_GEOAPIFY_KEY'
 GEOAPIFY_API_KEY = 'YOUR_GEOAPIFY_KEY'

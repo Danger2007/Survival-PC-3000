@@ -5,6 +5,8 @@ import settings
 from util_functs import Utils
 from cpp import wireframe
 import os
+import pygame
+import settings
 
 VAULTBOY_CACHE = {}
 
