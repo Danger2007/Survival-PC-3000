@@ -3,7 +3,6 @@ from configparser import ConfigParser
 from typing import Tuple, Dict
 
 
-
 class Inventory:
     
     _instance = None
@@ -98,7 +97,7 @@ class ItemLoader:
             }
             
             if item_type == 'Weapon':
-                self.items[section] = WeaponItem(
+                weapon = WeaponItem(
                     **base_data,
                     damage=int(data.get('damage', 0)),
                     fire_rate=int(data.get('fire_rate', 0)),
@@ -107,6 +106,11 @@ class ItemLoader:
                     ammo_type=data.get('ammo_type', ''),
                     damage_types=self._parse_icon_configs(data.get('damage_types', '')),
                 )
+                # Legge le mod dal file ini e le salva come lista nell'oggetto
+                mods_raw = data.get('mods', '')
+                weapon.mods = [m.strip() for m in mods_raw.split(',')] if mods_raw else []
+                
+                self.items[section] = weapon
             elif item_type == 'Apparel':
                 self.items[section] = ApparelItem(
                     **base_data,
@@ -136,11 +140,11 @@ class ItemLoader:
                     components=self._parse_dicts(data.get('components', ''))
                 )   
                              
-            elif item_type == 'Misc':
+            elif item_type in ('Misc', 'Weapon Mod'):
                 self.items[section] = MiscItem(
                     **base_data,
                     type=data.get('type', '')
-                    )
+                )
                 
             else:
                 raise ValueError(f"Unknown item type: {item_type}")

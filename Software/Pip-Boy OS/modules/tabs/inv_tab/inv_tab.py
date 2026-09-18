@@ -32,34 +32,31 @@ class InvTab:
         self.refresh_tab_layout()
 
     def refresh_tab_layout(self):
-        """
-        Configura la lista delle sotto-schede in base allo stile grafico attivo (FO4 vs NV).
-        """
         ui_style = str(getattr(settings, 'UI_STYLE', '')).lower()
-        is_nv = ui_style == 'fallout_nv'
+        is_nv = any(k in ui_style for k in ['nv', 'new_vegas', 'newvegas', 'fnv'])
         
-        # Rigenera MiscTab per caricare il corretto insieme di categorie
-        self.misc_tab = MiscTab(self.screen, self.tab_instance, self.draw_space)
-
         if is_nv:
-            # Layout Fallout New Vegas (5 Tab: Misc accorpa Misc, Junk e Mods)
+            if hasattr(self.tab_instance, 'header_text_left'):
+                setattr(self.tab_instance, 'header_text_left', ") ITEMS")
+            if hasattr(self.tab_instance, 'top_margin_spacing'):
+                setattr(self.tab_instance, 'top_margin_spacing', 18)
+
             self.sub_tabs = [
-                self.weapons_tab, # 0
-                self.apparel_tab, # 1
-                self.aid_tab,     # 2
-                self.misc_tab,    # 3
-                self.ammo_tab     # 4
+                self.weapons_tab,
+                self.apparel_tab,
+                self.aid_tab,
+                self.misc_tab,
+                self.ammo_tab
             ]
         else:
-            # Layout Fallout 4 (7 Tab)
             self.sub_tabs = [
-                self.weapons_tab, # 0: WEAPONS
-                self.apparel_tab, # 1: APPAREL
-                self.aid_tab,     # 2: AID
-                self.misc_tab,    # 3: MISC
-                self.junk_tab,    # 4: JUNK
-                self.mods_tab,    # 5: MODS
-                self.ammo_tab     # 6: AMMO
+                self.weapons_tab,
+                self.apparel_tab,
+                self.aid_tab,
+                self.misc_tab,
+                self.junk_tab,
+                self.mods_tab,
+                self.ammo_tab
             ]
 
         sub_tab_map = {i: tab for i, tab in enumerate(self.sub_tabs)}

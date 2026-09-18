@@ -32,6 +32,9 @@ class SettingsTab:
         
     def _load_settings(self):
         self.settings = []
+        if not os.path.exists(self.config_path):
+            return
+
         with open(self.config_path, 'r') as f:
             lines = f.readlines()
 
@@ -45,12 +48,18 @@ class SettingsTab:
                 var_name = var_name.strip()
                 raw_value = value.split('#')[0].strip()
                 
+                # Gestione sicura per evitare crash se il valore non è un letterale puro
+                try:
+                    parsed_val = ast.literal_eval(raw_value)
+                except (ValueError, SyntaxError):
+                    parsed_val = raw_value
+
                 self.settings.append({
                     'section': current_section,
                     'var_name': var_name,
                     'display_name': ' '.join(var_name.split('_')).title(),
-                    'value': ast.literal_eval(raw_value),
-                    'type': type(ast.literal_eval(raw_value)),
+                    'value': parsed_val,
+                    'type': type(parsed_val),
                     'comment': value.split('#')[1].strip() if '#' in value else ''
                 })
                 

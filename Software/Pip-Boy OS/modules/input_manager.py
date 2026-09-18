@@ -1,25 +1,34 @@
+import sys
 import pygame
 from queue import Queue
 from threading import Lock
-
 
 
 class InputManager:
     def __init__(self):
         self.key_queue = Queue()
         self.get_key_lock = Lock()
-        
-    
+
     def handle_keyboard(self, event: pygame.event.Event):
         if event.type == pygame.KEYDOWN:
             self.key_queue.put(event.key)
-            
 
-    def handle_quit(self, event: pygame.event.Event):
+    def handle_quit(self, event: pygame.event.Event, tab_manager=None):
         if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
-            pygame.quit()
-            quit()
+            # Arresta i thread delle schede prima di disattivare Pygame
+            if tab_manager and hasattr(tab_manager, 'tab_thread_handler'):
+                for tab in tab_manager.tab_thread_handler.tab_map.values():
+                    if hasattr(tab, 'handle_threads'):
+                        try:
+                            tab.handle_threads(False)
+                        except Exception:
+                            pass
 
+            try:
+                pygame.quit()
+            except Exception:
+                pass
+            sys.exit()
 
     def handle_input(self, tab_manager):
         with self.get_key_lock:
@@ -50,10 +59,16 @@ class InputManager:
                         tab_manager.navigate(3)
                     case _:
                         pass
-                
-        
-    
-    def run(self):
-        for event in pygame.event.get():
-            self.handle_keyboard(event)
-            self.handle_quit(event)
+
+    def run(self, tab_manager=None):
+        try:
+            # Controllo dello stato del mixer protetto da eccezioni di de-inizializzazione
+            if pygame.mixer.get_init() and pygame.mixer.music.get_busy():
+                pass
+
+            for event in pygame.event.get():
+                self.handle_keyboard(event)
+                self.handle_quit(event, tab_manager)
+        except pygame.error:
+            # Cattura la de-inizializzazione repentina di Pygame nel thread
+            return

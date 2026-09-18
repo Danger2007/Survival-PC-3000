@@ -44,8 +44,15 @@ class AmmoTab(InvBase):
             entries = self.get_grid_entries(self.unique_items[self.inv_list.selected_index])
             self.item_grid.update(entries)
 
+    def select_item(self):
+        if self.no_items:
+            return
+        super().select_item()
+        if not self.is_nv:
+            self.tab_instance.init_footer(self, (settings.SCREEN_WIDTH // 4, settings.SCREEN_WIDTH // 4), self.init_footer_text())
+
     def render(self):
         super().render()
-        if self.no_items or self.item_grid is None:
+        if self.no_items or self.item_grid is None or self.is_nv:
             return
         self.item_grid.render(self.screen)

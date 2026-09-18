@@ -6,9 +6,8 @@ from ui import ItemGrid
 
 class MiscTab(InvBase):
     def __init__(self, screen, tab_instance, draw_space):
-        # Determina le categorie da raggruppare in base al layout attivo
         ui_style = str(getattr(settings, 'UI_STYLE', '')).lower()
-        is_nv = ui_style == 'fallout_nv'
+        is_nv = any(k in ui_style for k in ['nv', 'new_vegas', 'newvegas', 'fnv'])
         category = ('Misc', 'Junk', 'Mods') if is_nv else 'Misc'
         
         super().__init__(screen, tab_instance, draw_space, category=category, enable_turntable=True)
@@ -63,8 +62,15 @@ class MiscTab(InvBase):
             entries = self.get_grid_entries(self.unique_items[self.inv_list.selected_index])
             self.item_grid.update(entries)
 
+    def select_item(self):
+        if self.no_items:
+            return
+        super().select_item()
+        if not self.is_nv:
+            self.tab_instance.init_footer(self, (settings.SCREEN_WIDTH // 4, settings.SCREEN_WIDTH // 4), self.init_footer_text())
+
     def render(self):
         super().render()
-        if self.no_items or self.item_grid is None:
+        if self.no_items or self.item_grid is None or self.is_nv:
             return
         self.item_grid.render(self.screen)

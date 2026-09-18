@@ -98,10 +98,14 @@ class Tab:
                 )
                 
         if text_surface is not None:
-            footer_surface.blit(
-                text_surface,
-                (0, 0)
-            )
+            if isinstance(text_surface, (list, tuple)):
+                for item in text_surface:
+                    if isinstance(item, (list, tuple)) and len(item) == 2:
+                        footer_surface.blit(item[0], item[1])
+                    elif isinstance(item, pygame.Surface):
+                        footer_surface.blit(item, (0, 0))
+            else:
+                footer_surface.blit(text_surface, (0, 0))
             
             
         # Store the surface in the dictionary
