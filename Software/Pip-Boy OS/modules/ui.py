@@ -386,9 +386,6 @@ class GenericList:
 
 
 
-
-
-
 # Generic grid class for displaying items with labels and values
 # Supports vertical dividers and highlighting of entries
 

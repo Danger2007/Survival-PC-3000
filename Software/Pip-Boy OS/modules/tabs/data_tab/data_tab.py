@@ -1,5 +1,5 @@
 import pygame
-# from .quests_tab import QuestsTab
+from .quest_tab import QuestsTab
 # from .workshops_tab import WorkshopsTab
 # from .stats_tab import StatsTab
 from .settings_tab import SettingsTab
@@ -24,14 +24,14 @@ class DataTab:
             self._init_footer_text()
         )
         
-        # self.quests_tab = QuestsTab(self.screen, self.tab_instance, self.draw_space)
+        self.quests_tab = QuestsTab(self.screen, self.tab_instance, self.draw_space)
         # self.workshops_tab = WorkshopsTab(self.screen, self.tab_instance, self.draw_space)
         # self.stats_tab = StatsTab(self.screen, self.tab_instance, self.draw_space)
         
         self.settings_tab = SettingsTab(self.screen, self.tab_instance, self.draw_space)
         
         sub_tab_map = {
-            # 0: self.quests_tab,
+            0: self.quests_tab,
             # 1: self.workshops_tab,
             # 2: self.stats_tab,
             3: self.settings_tab
@@ -54,7 +54,7 @@ class DataTab:
     def scroll(self, direction: bool):
         match self.current_sub_tab_index:
             case 0:  # Quests
-                # self.quests_tab.scroll(direction)
+                self.quests_tab.scroll(direction)
                 pass
             case 1:  # Workshops
                 # self.workshops_tab.scroll(direction)
@@ -70,7 +70,7 @@ class DataTab:
     def select_item(self):
         match self.current_sub_tab_index:
             case 0:  # Quests
-                # self.quests_tab.select_item()
+                self.quests_tab.select_item()
                 pass
             case 1:  # Workshops
                 # self.workshops_tab.select_item()
@@ -91,7 +91,7 @@ class DataTab:
         
         match self.current_sub_tab_index:
             case 0:  # Quests
-                # self.quests_tab.render()
+                self.quests_tab.render()
                 pass
             case 1:  # Workshops
                 # self.workshops_tab.render()
@@ -102,4 +102,15 @@ class DataTab:
             case 3:  # Settings
                 self.settings_tab.render()
             case _:  # DEFAULT
+                pass
+
+    def toggle_focus(self):
+        match self.current_sub_tab_index:
+            case 0:  # Quests
+                if hasattr(self.quests_tab, 'toggle_focus'):
+                    self.quests_tab.toggle_focus()
+            case 3:  # Settings
+                if hasattr(self.settings_tab, 'toggle_focus'):
+                    self.settings_tab.toggle_focus()
+            case _:
                 pass

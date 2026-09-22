@@ -145,7 +145,6 @@ class TabManager:
                 Utils.play_sfx(os.path.join(settings.BUZZ_SOUND_BASE_FOLDER, sound), settings.VOLUME / 3)       
                 
     def switch_sub_tab_sound(self):
-        """Riproduce il suono confrontando gli indici numerici della scheda attiva corrente."""
         if settings.SOUND_ON:
             main_idx = self.current_tab_index
             curr_sub = self.current_sub_tab_index[main_idx]
@@ -439,14 +438,12 @@ class TabManager:
         self.screen.blit(self.tab_highlight_surfaces[self.current_tab_index], (0, 0))
 
     def render_footer(self, current_tab_instance=None):
-        """Gestisce il rendering del footer in base allo stile grafico selezionato."""
         if getattr(settings, 'UI_STYLE', 'Fallout_4') == 'Fallout_NV':
             ui.draw_nv_ui(self.screen, self)
         else:
             self.draw_original_f4_footer(current_tab_instance)
 
     def draw_original_f4_footer(self, current_tab_instance=None):
-        """Delega il rendering del footer standard Fallout 4 alla classe base Tab."""
         if hasattr(self, 'tab_base') and hasattr(self.tab_base, 'render_footer'):
             target_tab = current_tab_instance or self.tabs[self.current_tab_index]
             self.tab_base.render_footer(target_tab)
@@ -508,3 +505,33 @@ class TabManager:
 
         if settings.RANDOM_GLITCHES and random.random() < settings.RANDOM_GLITCH_CHANCE / 100:
             self.crt_glitch_effect()
+
+    def get_active_subtab(self):
+        ui_style = str(getattr(settings, 'UI_STYLE', '')).lower()
+        if ui_style == 'fallout_nv':
+            match self.current_tab_index:
+                case 0:
+                    return self.stat_tab
+                case 1:
+                    return self.inv_tab
+                case 2:
+                    sub_idx = self.current_sub_tab_index[2]
+                    if sub_idx in (1, 2):
+                        return self.map_tab
+                    elif sub_idx == 4:
+                        return self.radio_tab
+                    else:
+                        return self.data_tab
+        else:
+            match self.current_tab_index:
+                case 0: return self.stat_tab
+                case 1: return self.inv_tab
+                case 2: return self.data_tab
+                case 3: return self.map_tab
+                case 4: return self.radio_tab
+        return None
+
+    def toggle_focus(self):
+        active_subtab = self.get_active_subtab()
+        if active_subtab and hasattr(active_subtab, 'toggle_focus'):
+            active_subtab.toggle_focus()
