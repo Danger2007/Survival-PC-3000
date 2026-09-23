@@ -98,7 +98,6 @@ class TabManager:
         self.init_subtab_data()
         self.tab_base.player_data = self.player_data 
         
-        self.stat_tab = StatTab(self.screen, self.tab_base, self.draw_space)
         tab_map = {
             0: self.stat_tab,
             1: self.inv_tab,
@@ -117,13 +116,14 @@ class TabManager:
                     self.stat_tab.render()
                 case 1: # INV
                     self.inv_tab.render()
-                case 2: # DATA (Quests, Local Map, World Map, Notes, Radio)
+                case 2: # DATA (Local Map 0, World Map 1, Quests 2, Misc 3, Radio 4)
                     sub_idx = self.current_sub_tab_index[2]
-                    if sub_idx in [1, 2]:    # Local Map, World Map
+                    if sub_idx in [0, 1]:    # Local Map (0), World Map (1)
+                        self.map_tab.set_map_mode(is_local=(sub_idx == 0))
                         self.map_tab.render()
                     elif sub_idx == 4:       # Radio
                         self.radio_tab.render()
-                    else:                    # Quests (0), Notes (3)
+                    else:                    # Quests (2), Misc (3)
                         self.data_tab.render()
         else:
             match self.current_tab_index:
@@ -133,7 +133,6 @@ class TabManager:
                 case 3: self.map_tab.render()
                 case 4: self.radio_tab.render()
 
-            
     def switch_tab_sound(self):
         if settings.SOUND_ON:
             if self.previous_tab_index is not None and self.current_tab_index > self.previous_tab_index:
@@ -242,16 +241,6 @@ class TabManager:
                     current_x += text_surf.get_width() + settings.SUBTAB_SPACING
 
                 self.subtab_bar_surfaces[tab_name].append(surface)
-                
-    def init_tab_text(self):
-        total_tab_width = sum(self.main_tab_font.size(tab)[0] for tab in self.tabs)
-        tab_spacing = (settings.SCREEN_WIDTH - total_tab_width - 2 * settings.TAB_MARGIN) // (len(self.tabs) + 1)
-        self.tab_x_offset.append(settings.TAB_MARGIN + tab_spacing)
-        
-        for i, tab in enumerate(self.tabs):
-            text_surface = self.main_tab_font.render(tab, True, settings.PIP_BOY_LIGHT)
-            self.tab_text_surface.blit(text_surface, (self.tab_x_offset[i], settings.TAB_VERTICAL_OFFSET))
-            self.tab_x_offset.append((self.main_tab_font.size(tab)[0] + tab_spacing) + self.tab_x_offset[i])
 
     def tab_switch_glitch(self):
         for _ in range(20):
@@ -283,7 +272,7 @@ class TabManager:
                 prev_sub = self.current_sub_tab_index[2]
                 if prev_sub == 4:
                     self.radio_tab.handle_threads(False)
-                elif prev_sub in [1, 2]:
+                elif prev_sub in [0, 1]:  # Local Map, World Map
                     self.map_tab.handle_threads(False)
                 else:
                     self.data_tab.handle_threads(False)
@@ -303,7 +292,8 @@ class TabManager:
                 curr_sub = self.current_sub_tab_index[2]
                 if curr_sub == 4:
                     self.radio_tab.handle_threads(True)
-                elif curr_sub in [1, 2]:
+                elif curr_sub in [0, 1]:
+                    self.map_tab.set_map_mode(is_local=(curr_sub == 0))
                     self.map_tab.handle_threads(True)
                 else:
                     self.data_tab.handle_threads(True)
@@ -346,17 +336,19 @@ class TabManager:
                 elif current_main_index == 2: # DATA
                     if current_sub_index == 4:
                         self.radio_tab.handle_threads(False)
-                    elif current_sub_index in [1, 2]:
+                    elif current_sub_index in [0, 1]:  # Local Map, World Map
                         self.map_tab.handle_threads(False)
                     else:
                         self.data_tab.handle_threads(False)
 
                     if new_index == 4:
                         self.radio_tab.handle_threads(True)
-                    elif new_index in [1, 2]:
+                    elif new_index in [0, 1]:
+                        self.map_tab.set_map_mode(is_local=(new_index == 0))
                         self.map_tab.handle_threads(True)
                     else:
-                        self.data_tab.change_sub_tab(new_index)
+                        data_internal_idx = 0 if new_index == 2 else 3
+                        self.data_tab.change_sub_tab(data_internal_idx)
                         self.data_tab.handle_threads(True)
             else:
                 match self.current_tab_index:
@@ -370,7 +362,7 @@ class TabManager:
             nv_subtabs = {
                 'STATS': ['STATUS', 'S.P.E.C.I.A.L.', 'SKILLS', 'PERKS', 'GENERAL'],
                 'ITEMS': ['WEAPONS', 'APPAREL', 'AID', 'MISC', 'AMMO'],
-                'DATA':  ['QUESTS', 'LOCAL MAP', 'WORLD MAP', 'MISC', 'RADIO']
+                'DATA':  ['LOCAL MAP', 'WORLD MAP', 'QUESTS', 'MISC', 'RADIO']
             }
             return nv_subtabs.get(self.tabs[self.current_tab_index], [])
         return settings.SUBTABS.get(self.tabs[self.current_tab_index], [])
@@ -386,7 +378,7 @@ class TabManager:
                     sub_idx = self.current_sub_tab_index[2]
                     if sub_idx == 4:         # RADIO
                         self.radio_tab.scroll(direction)
-                    elif sub_idx in (1, 2):  # MAPS
+                    elif sub_idx in (0, 1):  # MAPS
                         self.map_tab.scroll(direction)
                     else:                    # QUESTS / MISC
                         self.data_tab.scroll(direction)
@@ -403,13 +395,13 @@ class TabManager:
             match self.current_tab_index:
                 case 0: # STATS
                     self.stat_tab.select_item()
-                case 1:
+                case 1: # ITEMS
                     self.inv_tab.select_item()
                 case 2: # DATA
                     sub_idx = self.current_sub_tab_index[2]
                     if sub_idx == 4:         # RADIO
                         self.radio_tab.select_station()
-                    elif sub_idx in (1, 2):
+                    elif sub_idx in (0, 1):  # MAPS
                         pass
                     else:
                         self.data_tab.select_item()
@@ -426,7 +418,7 @@ class TabManager:
             match self.current_tab_index:
                 case 2: # DATA
                     sub_idx = self.current_sub_tab_index[2]
-                    if sub_idx in (1, 2):    # LOCAL MAP / WORLD MAP
+                    if sub_idx in (0, 1):    # LOCAL MAP / WORLD MAP
                         self.map_tab.navigate(direction)
         else:
             if self.current_tab_index == 3:
@@ -516,7 +508,7 @@ class TabManager:
                     return self.inv_tab
                 case 2:
                     sub_idx = self.current_sub_tab_index[2]
-                    if sub_idx in (1, 2):
+                    if sub_idx in (0, 1):
                         return self.map_tab
                     elif sub_idx == 4:
                         return self.radio_tab

@@ -451,33 +451,6 @@ class QuestsTab:
             if 0 <= self.selected_index < len(self.quests):
                 self._render_fo4_details(self.quests[self.selected_index], color_light, color_middle)
 
-        self._render_system_datetime(color_light)
-
-    def _render_system_datetime(self, color_light):
-        now = datetime.now()
-        date_str = now.strftime("%m.%d.%Y")
-        time_str = now.strftime("%I:%M %p")
-
-        date_surf = self.font_small.render(date_str, True, color_light)
-        time_surf = self.font_small.render(time_str, True, color_light)
-
-        bottom_bar_h = getattr(settings, 'BOTTOM_BAR_HEIGHT', 25)
-        footer_top = settings.SCREEN_HEIGHT - bottom_bar_h
-        cell_width = settings.SCREEN_WIDTH // 3
-
-        pos_y = footer_top + (bottom_bar_h - date_surf.get_height()) // 2
-        
-        date_x = 6
-        time_x = cell_width + 6
-
-        if self.is_nv:
-            pos_y -= 20
-        else:
-            time_x -= 30
-
-        self.screen.blit(date_surf, (date_x, pos_y))
-        self.screen.blit(time_surf, (time_x, pos_y))
-
     def _draw_fo4_double_arrow(self, x, y, pointing_up, color):
         """Disegna una freccia doppia (chevron doppio) in stile Fallout 4 orientata correttamente."""
         if pointing_up:
@@ -718,8 +691,8 @@ class QuestsTab:
 
         y_top = self.draw_space.top + 2
         y_actions = y_top + 1
-        act1 = self.font_main.render("Show Active Quest Notes X", True, color_light)
-        act2 = self.font_main.render("Challenges Y", True, color_light)
+        act1 = self.font_main.render("Make Active Quest ENTER)", True, color_light)
+        act2 = self.font_main.render("Show Location A)", True, color_light)
         
         right_x = self.draw_space.right - 20
         self.screen.blit(act1, (right_x - act1.get_width(), y_actions))

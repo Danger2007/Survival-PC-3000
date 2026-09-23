@@ -27,13 +27,13 @@ if UI_STYLE == "Fallout_NV":
     SUBTABS = {
         'STATS': ['STATUS', 'S.P.E.C.I.A.L.', 'SKILLS', 'PERKS', 'GENERAL'],
         "ITEMS": ("WEAPONS", "APPAREL", "AID", "MISC", "AMMO"),
-        "DATA": ("QUESTS", "LOCAL MAP", "WORLD MAP", "NOTES", "RADIO")
+        "DATA": ("LOCAL MAP", "WORLD MAP", "QUESTS", "MISC", "RADIO")
     }
 else:
     SUBTABS = {
         'STAT': ['STATUS', 'S.P.E.C.I.A.L.', 'PERKS'],
         "INV": ("WEAPONS", "APPAREL", "AID", "MISC", "JUNK", "MODS", "AMMO"),
-        "DATA": ("QUESTS", "WORKSHOPS", "STATS", "SETTINGS")
+        "DATA": ("QUESTS", "WORKSHOPS", "STATS", "NOTES", "SETTINGS")
     }
 
 # ==================================================

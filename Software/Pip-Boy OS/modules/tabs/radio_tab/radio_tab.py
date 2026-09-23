@@ -22,7 +22,6 @@ class RadioTab:
         self.tab_instance.init_footer(self)
         self.main_font = pygame.font.Font(settings.ROBOTO_BOLD_PATH, 12)
         
-        
         list_draw_space = pygame.Rect(
             self.draw_space.left,
             self.draw_space.top,
@@ -42,9 +41,27 @@ class RadioTab:
 
         self.current_song = None
         self.radio_music_thread_running = True
+        
+        self.stations_loaded = False
+        self.pending_station_names = []
 
-        self.loader = RadioStationLoader(settings.RADIO_BASE_FOLDER,
-                                         settings.DCR_INTERMISSIONS_BASE_FOLDER)
+        # Determinazione della cartella in base allo stile se RADIO_TYPE è FILES
+        radio_type = getattr(settings, 'RADIO_TYPE', 'FILES').upper()
+        
+        if radio_type == 'FILES':
+            ui_style = str(getattr(settings, 'UI_STYLE', 'fallout_4')).lower()
+            if ui_style in ('fallout_nv', 'fallout_new_vegas'):
+                sounds_dir = os.path.dirname(settings.RADIO_BASE_FOLDER)
+                radio_folder = os.path.join(sounds_dir, 'Radio NV')
+            else:
+                radio_folder = settings.RADIO_BASE_FOLDER
+        elif radio_type == 'FM':
+            # Predisposizione per il modulo FM hardware
+            radio_folder = settings.RADIO_BASE_FOLDER
+        else:
+            radio_folder = settings.RADIO_BASE_FOLDER
+
+        self.loader = RadioStationLoader(radio_folder, settings.DCR_INTERMISSIONS_BASE_FOLDER)
         self.playlist_manager = PlaylistManager()
         self.visualizer = Visualizer(self.draw_space, self.screen, self)
 
@@ -52,18 +69,41 @@ class RadioTab:
         Thread(target=self.update_radio_music, daemon=True).start()
 
     def load_radio_stations(self):
-        self.loader.load_radio_stations()
-        self.station_list.set_items(list(self.loader.radio_stations.keys()))
+        radio_type = getattr(settings, 'RADIO_TYPE', 'FILES').upper()
+
+        if radio_type == 'FILES':
+            # Carica unicamente la cartella selezionata in __init__ (senza mischiare)
+            self.loader.load_radio_stations()
+        elif radio_type == 'FM':
+            # Esempio di predisposizione per radio hardware FM
+            # self.loader.load_fm_stations()
+            pass
+
+        self.pending_station_names = list(self.loader.radio_stations.keys())
+        self.stations_loaded = True
 
     def play_station_switch_sound(self):
-        sound = random.choice(os.listdir(settings.RADIO_STATIC_BURSTS_BASE_FOLDER))
-        Utils.play_sfx(
-            os.path.join(settings.RADIO_STATIC_BURSTS_BASE_FOLDER, sound),
-            settings.VOLUME
-        )
+        if os.path.exists(settings.RADIO_STATIC_BURSTS_BASE_FOLDER):
+            sounds = os.listdir(settings.RADIO_STATIC_BURSTS_BASE_FOLDER)
+            if sounds:
+                sound = random.choice(sounds)
+                Utils.play_sfx(
+                    os.path.join(settings.RADIO_STATIC_BURSTS_BASE_FOLDER, sound),
+                    settings.VOLUME
+                )
 
     def scroll(self, direction: bool):
         self.station_list.change_selection(direction)
+
+    def handle_input(self, event):
+        """Gestisce lo scorrimento e la selezione delle stazioni via tastiera/input."""
+        if event.type == pygame.KEYDOWN:
+            if event.key in (pygame.K_UP, pygame.K_w):
+                self.scroll(True)
+            elif event.key in (pygame.K_DOWN, pygame.K_s):
+                self.scroll(False)
+            elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
+                self.select_station()
 
     def select_station(self):
         if self.station_list.selected_index == self.active_station_index:
@@ -77,7 +117,6 @@ class RadioTab:
             self.play_station_switch_sound()
 
         self.active_station_index = self.station_list.selected_index
-
 
     def update_radio_music(self):
         while self.radio_music_thread_running:
@@ -114,6 +153,10 @@ class RadioTab:
                     playlist_data["initialized"] = False
                     index = 0
                     playlist = playlist_data["playlist"]
+
+                if not playlist:
+                    pygame.time.wait(1000)
+                    continue
 
                 current_song = playlist[index]
                 if settings.DCR_INTERMISSIONS_BASE_FOLDER in current_song:
@@ -170,6 +213,20 @@ class RadioTab:
         self.visualizer.render()
 
     def render(self):
+        # Sincronizzazione sicura nell'event loop principale di Pygame
+        if self.stations_loaded and self.pending_station_names:
+            if hasattr(self.station_list, 'set_items'):
+                self.station_list.set_items(self.pending_station_names)
+            else:
+                self.station_list.items = self.pending_station_names
+
+            if hasattr(self.station_list, 'update_list'):
+                self.station_list.update_list()
+            elif hasattr(self.station_list, 'refresh'):
+                self.station_list.refresh()
+
+            self.pending_station_names = []
+
         self.tab_instance.render_footer(self)
         self.station_list.render(self.screen, self.active_station_index, self.station_playing)
         self.render_visualizer_waves()

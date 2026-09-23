@@ -1,4 +1,4 @@
-
+# Main entry point for the Pip-Boy application.
 import os
 import sys
 import pygame

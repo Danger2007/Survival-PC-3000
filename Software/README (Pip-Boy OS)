@@ -1,0 +1,25 @@
+# Pip-Boy OS
+
+The Pip-Boy OS (or Pip-Boy Operating System) is the 'soul' of the SPC 3000. 
+This is my first ever Python code, so I used a [half made base]() that I found online; I also used Gemini as a support in the making of the code, so as to understand Python faster and to speed up the programming process, however that doesn't mean that the code is AI slop, I came up with the logic and the AI just transcribed the logic in Python.
+## How To Run
+To start the code you need to run [main.py](./Software/Pip-Boy%20OS/modules/main.py), running other codes inside the software will not work. The code works perfectly on PC, give it a try!
+## Customization
+The Pip-Boy OS that you can find in the repo can also be personalized using the [configure.py](Software/Pip-Boy%20OS/configure.py) file. To start the code you need to run [main.py](./Software/Pip-Boy%20OS/modules/main.py) in Python, all the requirements are listed in the [requirements file](./Software/Pip-Boy%20OS/requirements.txt). 
+## Inputs
+The Pip-Boy OS uses for input:
+- **Left Arrow**: to move to the menu to the left
+- **Right Arrow**: to move to the menu to the right
+- **Up Arrow**: to change between the CND/EFF/RAD tabs in the *Fallout: New Vegas* UI or to move upwards on the lists in the tabs or to zoom in in the MAP tab/menu
+- **Down Arrow**:  to change between the CND/EFF/RAD tabs in the *Fallout: New Vegas* UI or to move downwards on the lists in the tabs or to zoom out in the MAP tab/menu
+- **A**: to change to the tab to the left
+- **D**: to change to the tab to the right
+- **I**: to move up in the MAP tab/menu
+- **K**: to move down in the MAP tab/menu
+- **J**: to move left in the MAP tab/menu
+- **L**: to move right in the MAP tab/menu
+- **X**: to change the area that you are scrolling in Quests and Notes/Misc Tabs in the DATA Menu
+
+## Important information
+- This version might not work on the SPC 3000: As I don't currently have the hardware I cannot check;
+- The Code can change: If you see this README, it means that I shipped a DEMO of the software, a WIP with all UI elements working;
