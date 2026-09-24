@@ -6,7 +6,7 @@ This is my first ever Python code, so I used a [half made base]() that I found o
 ![Prenentation NV Gif](./Pip-Boy%20OS/documentation/screenshots/Record.gif)
 
 ## First Run Preparations And Requirements
-All the software requirements are listed in the [requirements file](./Software/Pip-Boy%20OS/requirements.txt)
+All the software requirements are listed in the [requirements file](./Pip-Boy%20OS/requirements.txt)
 Before running the Pip-Boy OS for the first time you'll need to run the file **init** (init.bash if you are using windows; init.sh if you're using linux) these files create various vital files and folders in the Pip-Boy OS (it generates the '**cache**' folder and the '**settings_secret**' file). **In case init doesn't compile/run**: you have to manually add the cache folder with inside 2 folders named '**map**' and '**places**' and you have to add a Python file inside **modules** called '**settings_secret**' with these lines of code.
 
         REAL_LOCATION = 'YOUR_LOCATION'
@@ -16,11 +16,11 @@ Before running the Pip-Boy OS for the first time you'll need to run the file **i
  
 REMEMBER: if you want to see the IRL Map you need to insert in the code above your information (doesn't need to be true) and Create/Insert your Geoapify API Key (at https://www.geoapify.com/get-started-with-maps-api/ in the "Project and API Keys" section); DO NOT insert the URL (it doesn't work).
 ## How To Run
-To start the code you need to run [main.py](./Software/Pip-Boy%20OS/modules/main.py), running other codes inside the software will not work. The code works perfectly on PC, give it a try!
+To start the code you need to run [main.py](./Pip-Boy%20OS/modules/main.py), running other codes inside the software will not work. The code works perfectly on PC, give it a try!
 ![alt text](./Pip-Boy%20OS/documentation/screenshots/image-1.png)
 
 ## Customization
-The Pip-Boy OS that you can find in the repo can also be personalized using the [configure.py](Software/Pip-Boy%20OS/configure.py) file. To start the code you need to run [main.py](./Software/Pip-Boy%20OS/modules/main.py) in Python, all the requirements are listed in the [requirements file](./Software/Pip-Boy%20OS/requirements.txt). To move in the configure.py UI you use as inputs:
+The Pip-Boy OS that you can find in the repo can also be personalized using the [configure.py](./Pip-Boy%20OS/configure.py) file. To start the code you need to run [main.py](./Pip-Boy%20OS/modules/main.py) in Python, all the requirements are listed in the [requirements file](./Pip-Boy%20OS/requirements.txt). To move in the configure.py UI you use as inputs:
 - **Numpad 2**: to move down
 - **Numpad 8**: to move up
 - **ENTER**: To change/select an option
