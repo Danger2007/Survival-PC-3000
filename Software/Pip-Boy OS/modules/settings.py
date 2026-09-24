@@ -3,7 +3,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 from data_models import LimbPosition, IconConfig
 from items import ItemLoader, Inventory
 
-# Import sicuro delle chiavi segrete per evitare crash se il file non esiste
+# Safe import of settings_secrets if it exists
 try:
     from settings_secrets import *
 except ImportError:
@@ -340,6 +340,6 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 USER_CONFIG_PATH = os.path.join(CURRENT_DIR, 'user_config.py')
 if os.path.exists(USER_CONFIG_PATH):
     from user_config import *
-
-GEOAPIFY_KEY = 'YOUR_GEOAPIFY_KEY'
-GEOAPIFY_API_KEY = 'YOUR_GEOAPIFY_KEY'
+    
+GEOAPIFY_KEY = '7c995894d2c3492a8a9063f46d122e97'
+GEOAPIFY_API_KEY = '7c995894d2c3492a8a9063f46d122e97'

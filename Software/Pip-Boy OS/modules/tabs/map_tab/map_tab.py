@@ -81,11 +81,11 @@ class MapTab:
             self.world_map_subtab.map_zoom = target_zoom
 
     def set_map_mode(self, is_local: bool):
-        """Imposta la modalità tra Local Map e World Map mantenendo lo zoom distinto"""
+        """Method to switch between local and world map modes, preserving zoom levels"""
         if self.is_local_map == is_local:
             return
 
-        # Salva lo zoom corrente della modalità precedente prima di passare alla nuova
+        # Saves the current zoom level before switching modes
         if self.is_local_map is not None:
             current_zoom = self._get_current_zoom()
             if self.is_local_map:
