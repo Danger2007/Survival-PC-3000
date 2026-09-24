@@ -20,7 +20,7 @@ To start the code you need to run [main.py](./Pip-Boy%20OS/modules/main.py), run
 ![alt text](./Pip-Boy%20OS/documentation/screenshots/image-1.png)
 
 ## Customization
-The Pip-Boy OS that you can find in the repo can also be personalized using the [configure.py](./Pip-Boy%20OS/configure.py) file. To start the code you need to run [main.py](./Pip-Boy%20OS/modules/main.py) in Python, all the requirements are listed in the [requirements file](./Pip-Boy%20OS/requirements.txt). To move in the configure.py UI you use as inputs:
+The Pip-Boy OS that you can find in the repo can also be personalized using the [configure.py](./Pip-Boy%20OS/configure.py) file. To move in the configure.py UI you use as inputs:
 - **Numpad 2**: to move down
 - **Numpad 8**: to move up
 - **ENTER**: To change/select an option
