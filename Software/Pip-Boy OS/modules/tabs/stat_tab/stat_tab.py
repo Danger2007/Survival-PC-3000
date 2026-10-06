@@ -42,16 +42,30 @@ class StatTab:
                 4: self.general_tab
             }
         else:
-            # Mappa Fallout 4: STATUS (0), SPECIAL (1), PERKS (2), SKILLS (3)
             sub_tab_map = {
                 0: self.status_tab,
                 1: self.special_tab,
                 2: self.perks_tab
             }
         
-        # Rimuovi la riga duplicata che c'era prima
         self.sub_tab_thread_handler = ThreadHandler(sub_tab_map, self.current_sub_tab_index)
-    
+
+    def is_editing(self):
+        ui_style = str(getattr(settings, 'UI_STYLE', '')).lower()
+        if ui_style == 'fallout_nv' and self.current_sub_tab_index == 4:
+            return self.general_tab.is_editing()
+        return False
+
+    def get_active_subtab(self):
+        ui_style = str(getattr(settings, 'UI_STYLE', '')).lower()
+        if ui_style == 'fallout_nv':
+            match self.current_sub_tab_index:
+                case 0: return self.status_tab
+                case 1: return self.special_tab
+                case 3: return self.perks_tab
+                case 4: return self.general_tab
+        return self
+
     def init_footer_text(self): 
         hp_string = f"{self.dynamic_footer_text[0][0]} {self.dynamic_footer_text[0][1]}/{self.dynamic_footer_text[0][2]}"
         level_string = f"{self.dynamic_footer_text[1][0]} {self.dynamic_footer_text[1][1]}"
@@ -88,16 +102,16 @@ class StatTab:
         self.sub_tab_thread_handler.update_tab_index(self.current_sub_tab_index)
         
     def handle_input(self, event):
-        """Inoltra l'input alla scheda attiva se necessario."""
         ui_style = str(getattr(settings, 'UI_STYLE', '')).lower()
         if ui_style == 'fallout_nv':
-            if self.current_sub_tab_index == 3:
-                self.perks_tab.handle_input(event)
-            elif self.current_sub_tab_index == 4 and event.type == pygame.KEYDOWN and event.key == pygame.K_r:
-                self.general_tab.toggle_mode()
+            if self.current_sub_tab_index == 4:
+                return self.general_tab.handle_input(event)
+            elif self.current_sub_tab_index == 3:
+                return self.perks_tab.handle_input(event) if hasattr(self.perks_tab, 'handle_input') else False
         else:
             if self.current_sub_tab_index == 2:
-                self.perks_tab.handle_input(event)
+                return self.perks_tab.handle_input(event) if hasattr(self.perks_tab, 'handle_input') else False
+        return False
 
     def _scroll_skills(self, direction: bool):
         skills_count = len(getattr(settings, 'DEFAULT_SKILLS', []))
@@ -127,7 +141,13 @@ class StatTab:
     def select_item(self):
         ui_style = str(getattr(settings, 'UI_STYLE', '')).lower()
         if ui_style == 'fallout_nv' and self.current_sub_tab_index == 4:
-            self.general_tab.toggle_mode()
+            return self.general_tab.select_item()
+        return False
+
+    def handle_x_press(self):
+        ui_style = str(getattr(settings, 'UI_STYLE', '')).lower()
+        if ui_style == 'fallout_nv' and self.current_sub_tab_index == 4:
+            self.general_tab.handle_x_press()
 
     def render(self):
         ui_style = str(getattr(settings, 'UI_STYLE', '')).lower()
@@ -162,4 +182,3 @@ class StatTab:
                         settings.PIP_BOY_LIGHT, self.footer_font,
                         settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT
                     )
-                    

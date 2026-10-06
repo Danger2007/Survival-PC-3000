@@ -165,19 +165,22 @@ class NotesTab:
     def handle_input(self, event):
         visible_notes = self._get_sorted_visible_notes()
         if not visible_notes:
-            return
+            return False
 
         if event.type == pygame.KEYDOWN:
-            if event.key in (pygame.K_x, pygame.K_RIGHT, pygame.K_d) and not self.focus_on_desc:
+            if event.key == pygame.K_x:
                 self.toggle_focus()
-            elif event.key in (pygame.K_LEFT, pygame.K_a) and self.focus_on_desc:
-                self.toggle_focus()
+                return True
             elif event.key in (pygame.K_RETURN, pygame.K_SPACE, pygame.K_e):
                 self.select_item()
+                return True
             elif event.key in (pygame.K_UP, pygame.K_w):
                 self.scroll(True)
+                return True
             elif event.key in (pygame.K_DOWN, pygame.K_s):
                 self.scroll(False)
+                return True
+        return False
 
     def toggle_focus(self):
         """Alterna il focus tra la lista delle note e il testo del dettaglio a destra."""

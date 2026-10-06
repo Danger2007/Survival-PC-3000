@@ -254,12 +254,17 @@ class QuestsTab:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_x:
                 self.toggle_focus()
+                return True
             elif event.key in (pygame.K_UP, pygame.K_w):
                 self.scroll(True)
+                return True
             elif event.key in (pygame.K_DOWN, pygame.K_s):
                 self.scroll(False)
+                return True
             elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
                 self.select_item()
+                return True
+        return False
 
     def _is_quest_fully_visible(self, target_idx, offset):
         """Verifica se la quest target_idx viene renderizzata interamente con l'offset fornito."""

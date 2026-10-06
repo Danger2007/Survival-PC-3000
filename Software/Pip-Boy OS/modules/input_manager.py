@@ -11,7 +11,7 @@ class InputManager:
 
     def handle_keyboard(self, event: pygame.event.Event):
         if event.type == pygame.KEYDOWN:
-            self.key_queue.put(event.key)
+            self.key_queue.put(event)  # Passiamo direttamente l'evento per supportare sia event.key che logiche complesse
 
     def handle_quit(self, event: pygame.event.Event, tab_manager=None):
         if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
@@ -32,7 +32,31 @@ class InputManager:
     def handle_input(self, tab_manager):
         with self.get_key_lock:
             while not self.key_queue.empty():
-                key = self.key_queue.get()
+                event = self.key_queue.get()
+                key = event.key if hasattr(event, 'key') else event
+                
+                active_subtab = tab_manager.get_active_subtab()
+                
+                # Se la scheda/sottoscheda attiva gestisce direttamente l'input tramite handle_input e consuma l'evento
+                if active_subtab and hasattr(active_subtab, 'handle_input'):
+                    if active_subtab.handle_input(event):
+                        continue  # Evento già processato internamente (evita il doppio invio/cambio scheda)
+
+                # Se la scheda/sottoscheda attiva è in modalità editing (popup o modal aperto)
+                if active_subtab and hasattr(active_subtab, 'is_editing') and active_subtab.is_editing():
+                    match key:
+                        case pygame.K_RETURN:
+                            tab_manager.select_item()
+                        case pygame.K_x:
+                            tab_manager.handle_x_press()
+                        case pygame.K_UP:
+                            tab_manager.scroll_tab(True)
+                        case pygame.K_DOWN:
+                            tab_manager.scroll_tab(False)
+                        case _:
+                            pass
+                    continue
+
                 match key:
                     case pygame.K_LEFT:
                         tab_manager.switch_tab(False)
@@ -49,10 +73,7 @@ class InputManager:
                     case pygame.K_d:
                         tab_manager.switch_sub_tab(True)
                     case pygame.K_x:
-                        if hasattr(tab_manager, 'toggle_focus'):
-                            tab_manager.toggle_focus()
-                        elif hasattr(tab_manager, 'current_subtab') and hasattr(tab_manager.current_subtab, 'toggle_focus'):
-                            tab_manager.current_subtab.toggle_focus()
+                        tab_manager.handle_x_press()
                     case pygame.K_j:
                         tab_manager.navigate(0)
                     case pygame.K_i:

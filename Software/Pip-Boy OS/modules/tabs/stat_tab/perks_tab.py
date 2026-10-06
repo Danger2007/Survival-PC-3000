@@ -85,17 +85,23 @@ class PerksTab:
 
     def handle_input(self, event):
         if not self.perks_data:
-            return
+            return False
 
         if event.type == pygame.KEYDOWN:
             if event.key in (pygame.K_UP, pygame.K_w):
                 self.selected_index = max(0, self.selected_index - 1)
+                return True
             elif event.key in (pygame.K_DOWN, pygame.K_s):
                 self.selected_index = min(len(self.perks_data) - 1, self.selected_index + 1)
+                return True
             elif event.key == pygame.K_PAGEUP:
                 self.selected_index = max(0, self.selected_index - 5)
+                return True
             elif event.key == pygame.K_PAGEDOWN:
                 self.selected_index = min(len(self.perks_data) - 1, self.selected_index + 5)
+                return True
+
+        return False
 
     def _load_and_scale_img(self, img_path, max_size, cache_key):
         """Carica l'immagine (Pygame/PIL) e la scala mantenendo le proporzioni."""

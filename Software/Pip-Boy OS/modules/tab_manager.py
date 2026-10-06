@@ -258,6 +258,10 @@ class TabManager:
             self.render_blur = False 
 
     def switch_tab(self, direction: bool):
+        active_subtab = self.get_active_subtab()
+        if active_subtab and hasattr(active_subtab, 'is_editing') and active_subtab.is_editing():
+            return
+
         with self.switch_lock:
             prev_tab_index = self.current_tab_index
             self.previous_tab_index = self.current_tab_index
@@ -314,6 +318,10 @@ class TabManager:
         self.switch_tab_sound()
 
     def switch_sub_tab(self, direction: bool):
+        active_subtab = self.get_active_subtab()
+        if active_subtab and hasattr(active_subtab, 'is_editing') and active_subtab.is_editing():
+            return
+
         current_main_index = self.current_tab_index
         current_sub_index = self.current_sub_tab_index[current_main_index]
         
@@ -394,7 +402,11 @@ class TabManager:
         if self.ui_style == 'fallout_nv':
             match self.current_tab_index:
                 case 0: # STATS
-                    self.stat_tab.select_item()
+                    active_subtab = self.get_active_subtab()
+                    if active_subtab and hasattr(active_subtab, 'select_item'):
+                        active_subtab.select_item()
+                    else:
+                        self.stat_tab.select_item()
                 case 1: # ITEMS
                     self.inv_tab.select_item()
                 case 2: # DATA
@@ -404,10 +416,17 @@ class TabManager:
                     elif sub_idx in (0, 1):  # MAPS
                         pass
                     else:
-                        self.data_tab.select_item()
+                        active_subtab = self.get_active_subtab()
+                        if active_subtab and hasattr(active_subtab, 'select_item') and active_subtab != self.data_tab:
+                            active_subtab.select_item()
+                        else:
+                            self.data_tab.select_item()
         else:
             match self.current_tab_index:
-                case 0: pass
+                case 0:
+                    active_subtab = self.get_active_subtab()
+                    if active_subtab and hasattr(active_subtab, 'select_item'):
+                        active_subtab.select_item()
                 case 1: self.inv_tab.select_item()
                 case 2: self.data_tab.select_item()
                 case 3: pass
@@ -503,6 +522,10 @@ class TabManager:
         if ui_style == 'fallout_nv':
             match self.current_tab_index:
                 case 0:
+                    if hasattr(self.stat_tab, 'get_active_subtab'):
+                        active = self.stat_tab.get_active_subtab()
+                        if active:
+                            return active
                     return self.stat_tab
                 case 1:
                     return self.inv_tab
@@ -513,12 +536,26 @@ class TabManager:
                     elif sub_idx == 4:
                         return self.radio_tab
                     else:
+                        if hasattr(self.data_tab, 'get_active_subtab'):
+                            active = self.data_tab.get_active_subtab()
+                            if active:
+                                return active
                         return self.data_tab
         else:
             match self.current_tab_index:
-                case 0: return self.stat_tab
+                case 0:
+                    if hasattr(self.stat_tab, 'get_active_subtab'):
+                        active = self.stat_tab.get_active_subtab()
+                        if active:
+                            return active
+                    return self.stat_tab
                 case 1: return self.inv_tab
-                case 2: return self.data_tab
+                case 2:
+                    if hasattr(self.data_tab, 'get_active_subtab'):
+                        active = self.data_tab.get_active_subtab()
+                        if active:
+                            return active
+                    return self.data_tab
                 case 3: return self.map_tab
                 case 4: return self.radio_tab
         return None
@@ -526,4 +563,19 @@ class TabManager:
     def toggle_focus(self):
         active_subtab = self.get_active_subtab()
         if active_subtab and hasattr(active_subtab, 'toggle_focus'):
+            active_subtab.toggle_focus()
+
+    def handle_x_press(self):
+        active_subtab = self.get_active_subtab()
+        if not active_subtab:
+            return
+
+        # 1. Se il subtab/scheda attiva implementa handle_x_press
+        if hasattr(active_subtab, 'handle_x_press'):
+            active_subtab.handle_x_press()
+        # 2. Se è GeneralTab o un wrapper con modalità SETTINGS
+        elif getattr(active_subtab, 'mode', None) == "SETTINGS" and hasattr(active_subtab, 'settings_tab'):
+            active_subtab.settings_tab.handle_x_press()
+        # 3. Fallback standard su toggle_focus
+        elif hasattr(active_subtab, 'toggle_focus'):
             active_subtab.toggle_focus()

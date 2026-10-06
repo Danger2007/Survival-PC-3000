@@ -23,9 +23,9 @@ class RadioTab:
         self.main_font = pygame.font.Font(settings.ROBOTO_BOLD_PATH, 12)
         
         list_draw_space = pygame.Rect(
-            self.draw_space.left,
+            self.draw_space.left + settings.TAB_SIDE_MARGIN,
             self.draw_space.top,
-            self.draw_space.centerx - 2 * settings.TAB_SIDE_MARGIN,
+            (self.draw_space.width // 2) - settings.TAB_SIDE_MARGIN,
             self.draw_space.height
         )
         
@@ -100,10 +100,14 @@ class RadioTab:
         if event.type == pygame.KEYDOWN:
             if event.key in (pygame.K_UP, pygame.K_w):
                 self.scroll(True)
+                return True
             elif event.key in (pygame.K_DOWN, pygame.K_s):
                 self.scroll(False)
+                return True
             elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
                 self.select_station()
+                return True
+        return False
 
     def select_station(self):
         if self.station_list.selected_index == self.active_station_index:

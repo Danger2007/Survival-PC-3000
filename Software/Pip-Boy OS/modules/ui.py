@@ -361,66 +361,43 @@ class GenericList:
         return prev_index
 
     def render(self, screen, active_index=None, is_playing=False):
-        """Render the list on the given screen surface, highlighting the selected item and showing a square indicator for active items inside the box."""
+        """Render the list on the given screen surface with compact spacing."""
         ui_style = str(getattr(settings, 'UI_STYLE', 'fallout_4')).lower()
         y = self.draw_space.top
-    
-        # Interlinea maggiorata (+6px)
-        font_h = getattr(self, 'font_height', self.font.get_height() if hasattr(self, 'font') else 20)
-        item_h = font_h + 6
+
+        font_h = self.font.get_height()
+        item_h = font_h + 4  # Altezza del rettangolo di selezione
+        spacing = 4          # Spazio verticale tra una voce e l'altra
 
         for i, item in enumerate(self.items):
-            if ui_style in ('fallout_nv', 'fallout_new_vegas'):
-                # Allungato di 10px verso sinistra: rect_x passa da 15px a 5px
-                rect_x = 5  
-                rect_w = self.draw_space.width + (self.draw_space.left - 5)
-                # Spostiamo il testo a destra (rect_x + 20) per lasciare spazio al quadratino
-                text_x = rect_x + 20
-            else:
-                rect_x = self.draw_space.left
-                rect_w = self.draw_space.width
-                text_x = self.draw_space.left + 10
+            rect_x = self.draw_space.left
+            rect_w = self.draw_space.width
 
+            text_x = rect_x + (6 if ui_style in ('fallout_nv', 'fallout_new_vegas') else 10)
             item_rect = pygame.Rect(rect_x, y, rect_w, item_h)
 
             if i == self.selected_index:
                 if ui_style in ('fallout_nv', 'fallout_new_vegas'):
-                    # Rettangolo vuoto con spessore 1px
                     pygame.draw.rect(screen, settings.PIP_BOY_LIGHT, item_rect, width=1)
                     text_color = settings.PIP_BOY_LIGHT
                 else:
-                    # Rettangolo pieno stile Fallout 4
                     pygame.draw.rect(screen, settings.PIP_BOY_LIGHT, item_rect)
                     text_color = settings.BACKGROUND
             else:
                 text_color = settings.PIP_BOY_LIGHT
 
-            # Disegno del nome della stazione
             text_surface = self.font.render(str(item), True, text_color)
-            screen.blit(text_surface, (text_x, y + 2))
+            screen.blit(text_surface, (text_x, y + 1))
 
-            # --- Indicator Radio (Quadratino dentro il rettangolo) ---
             if getattr(self, 'enable_dot', False) and active_index == i and is_playing:
                 square_size = 6
-                if ui_style in ('fallout_nv', 'fallout_new_vegas'):
-                    # Posizionato dentro il rettangolo sulla sinistra
-                    sq_x = rect_x + 7
-                    sq_y = y + (item_h - square_size) // 2
-                    square_color = settings.PIP_BOY_LIGHT
-                else:
-                    # Stile classico fuori dal rettangolo
-                    sq_x = self.draw_space.left - 15
-                    sq_y = y + (item_h - square_size) // 2
-                    square_color = settings.PIP_BOY_LIGHT
+                sq_x = rect_x + 4
+                sq_y = y + (item_h - square_size) // 2
+                square_color = settings.PIP_BOY_LIGHT if ui_style not in ('fallout_nv', 'fallout_new_vegas') or i != self.selected_index else settings.BACKGROUND
 
-                # Disegna il quadratino pieno
                 pygame.draw.rect(screen, square_color, (sq_x, sq_y, square_size, square_size))
 
-            y += item_h
-
-# Generic grid class for displaying items with labels and values
-# Supports vertical dividers and highlighting of entries
-
+            y += item_h + spacing
 
 class ItemGrid:
     def __init__(self, draw_space, font, padding=5, text_margin=0.5):

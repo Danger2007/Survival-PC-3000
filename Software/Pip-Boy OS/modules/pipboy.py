@@ -13,6 +13,7 @@ class PipBoy:
         """
         self.screen = screen
         self.clock = clock
+        self.should_restart = False  # Flag for a clean reset
         self.states = iter(["boot", "main"])
         self.current_sequence = "main"   
         
