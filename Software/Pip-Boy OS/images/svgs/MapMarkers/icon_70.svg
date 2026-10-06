@@ -1,6 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="127pt" height="68pt" viewBox="0 0 127 68" version="1.1">
-<g id="surface1">
-<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 63.5 47.21875 L 114.09375 2.117188 L 119.773438 0.0429688 L 124.933594 2.636719 L 127 8.339844 L 124.417969 13.523438 L 63.5 67.957031 L 2.582031 13.523438 L 0 8.339844 L 2.066406 2.636719 L 7.226562 0.0429688 L 12.90625 2.117188 L 63.5 47.21875 "/>
-</g>
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 598 842" width="598" height="842">
+	<style>
+		tspan { white-space:pre } 
+		.t0 { font-size: 87px;fill: #ffffff;font-weight: 400;font-family: "DejaVuSans", "DejaVu Sans" } 
+	</style>
+	<g id="Layer 1">
+		<text id="Placeholder     (sorry)         " style="transform: matrix(1.125,0,0,1.125,13,387.45)">
+			<tspan x="0" y="0" class="t0">P</tspan><tspan  y="0" class="t0">l</tspan><tspan  y="0" class="t0">a</tspan><tspan  y="0" class="t0">c</tspan><tspan  y="0" class="t0">e</tspan><tspan  y="0" class="t0">h</tspan><tspan  y="0" class="t0">o</tspan><tspan  y="0" class="t0">l</tspan><tspan  y="0" class="t0">d</tspan><tspan  y="0" class="t0">e</tspan><tspan  y="0" class="t0">r</tspan><tspan  y="0" class="t0">
+</tspan>
+			<tspan x="0" y="104.4" class="t0"> </tspan><tspan  y="104.4" class="t0"> </tspan><tspan  y="104.4" class="t0"> </tspan><tspan  y="104.4" class="t0"> </tspan><tspan  y="104.4" class="t0">(</tspan><tspan  y="104.4" class="t0">s</tspan><tspan  y="104.4" class="t0">o</tspan><tspan  y="104.4" class="t0">r</tspan><tspan  y="104.4" class="t0">r</tspan><tspan  y="104.4" class="t0">y</tspan><tspan  y="104.4" class="t0">)</tspan><tspan  y="104.4" class="t0">
+</tspan>
+			<tspan x="0" y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0">:</tspan><tspan  y="208.8" class="t0">(</tspan><tspan  y="208.8" class="t0">
+</tspan>
+		</text>
+	</g>
 </svg>

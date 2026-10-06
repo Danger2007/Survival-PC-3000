@@ -1,6 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="128pt" height="128pt" viewBox="0 0 128 128" version="1.1">
-<g id="surface1">
-<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 119.488281 119.488281 L 119.488281 29.617188 L 62.636719 8.511719 L 8.511719 29.617188 L 8.511719 119.488281 L 119.488281 119.488281 M 65.703125 0.679688 L 122.210938 21.445312 C 126.070312 23.035156 128 25.757812 128 29.617188 L 128 119.488281 C 128 121.757812 127.207031 123.800781 125.617188 125.617188 C 123.800781 127.207031 121.757812 128 119.488281 128 L 8.511719 128 C 6.242188 128 4.199219 127.207031 2.382812 125.617188 C 0.792969 123.800781 0 121.757812 0 119.488281 L 0 29.617188 C 0 25.757812 1.816406 23.035156 5.445312 21.445312 L 59.574219 0.679688 L 62.636719 0 L 65.703125 0.679688 "/>
-</g>
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 598 842" width="598" height="842">
+	<style>
+		tspan { white-space:pre } 
+		.t0 { font-size: 87px;fill: #ffffff;font-weight: 400;font-family: "DejaVuSans", "DejaVu Sans" } 
+	</style>
+	<g id="Layer 1">
+		<text id="Placeholder     (sorry)         " style="transform: matrix(1.125,0,0,1.125,13,387.45)">
+			<tspan x="0" y="0" class="t0">P</tspan><tspan  y="0" class="t0">l</tspan><tspan  y="0" class="t0">a</tspan><tspan  y="0" class="t0">c</tspan><tspan  y="0" class="t0">e</tspan><tspan  y="0" class="t0">h</tspan><tspan  y="0" class="t0">o</tspan><tspan  y="0" class="t0">l</tspan><tspan  y="0" class="t0">d</tspan><tspan  y="0" class="t0">e</tspan><tspan  y="0" class="t0">r</tspan><tspan  y="0" class="t0">
+</tspan>
+			<tspan x="0" y="104.4" class="t0"> </tspan><tspan  y="104.4" class="t0"> </tspan><tspan  y="104.4" class="t0"> </tspan><tspan  y="104.4" class="t0"> </tspan><tspan  y="104.4" class="t0">(</tspan><tspan  y="104.4" class="t0">s</tspan><tspan  y="104.4" class="t0">o</tspan><tspan  y="104.4" class="t0">r</tspan><tspan  y="104.4" class="t0">r</tspan><tspan  y="104.4" class="t0">y</tspan><tspan  y="104.4" class="t0">)</tspan><tspan  y="104.4" class="t0">
+</tspan>
+			<tspan x="0" y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0">:</tspan><tspan  y="208.8" class="t0">(</tspan><tspan  y="208.8" class="t0">
+</tspan>
+		</text>
+	</g>
 </svg>

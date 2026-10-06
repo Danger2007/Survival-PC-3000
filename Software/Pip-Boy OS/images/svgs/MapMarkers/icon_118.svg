@@ -1,7 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="127pt" height="98pt" viewBox="0 0 127 98" version="1.1">
-<g id="surface1">
-<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 69.460938 53.046875 L 69.460938 69.828125 L 18.1875 69.828125 L 18.1875 53.046875 L 69.460938 53.046875 M 115.371094 48.25 L 120.140625 48.25 L 120.140625 40.160156 L 6.859375 40.160156 L 6.859375 48.25 L 11.628906 48.25 L 11.628906 91.105469 L 50.679688 91.105469 L 50.679688 80.917969 L 76.019531 80.917969 L 76.019531 91.105469 L 115.371094 91.105469 L 115.371094 48.25 M 83.472656 53.046875 L 108.515625 53.046875 L 108.515625 69.828125 L 83.472656 69.828125 L 83.472656 53.046875 M 126.996094 33.265625 L 126.996094 54.542969 L 122.226562 54.542969 L 122.226562 98 L 4.773438 98 L 4.773438 54.542969 L 0.00390625 54.542969 L 0.00390625 33.265625 L 126.996094 33.265625 "/>
-<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 104.9375 4.496094 L 100.167969 4.496094 L 100.167969 0 L 106.726562 0 L 106.726562 40.160156 L 100.167969 40.160156 L 100.167969 21.578125 L 104.9375 21.578125 L 104.9375 14.683594 L 100.167969 14.683594 L 100.167969 11.386719 L 104.9375 11.386719 L 104.9375 4.496094 "/>
-</g>
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 598 842" width="598" height="842">
+	<style>
+		tspan { white-space:pre } 
+		.t0 { font-size: 87px;fill: #ffffff;font-weight: 400;font-family: "DejaVuSans", "DejaVu Sans" } 
+	</style>
+	<g id="Layer 1">
+		<text id="Placeholder     (sorry)         " style="transform: matrix(1.125,0,0,1.125,13,387.45)">
+			<tspan x="0" y="0" class="t0">P</tspan><tspan  y="0" class="t0">l</tspan><tspan  y="0" class="t0">a</tspan><tspan  y="0" class="t0">c</tspan><tspan  y="0" class="t0">e</tspan><tspan  y="0" class="t0">h</tspan><tspan  y="0" class="t0">o</tspan><tspan  y="0" class="t0">l</tspan><tspan  y="0" class="t0">d</tspan><tspan  y="0" class="t0">e</tspan><tspan  y="0" class="t0">r</tspan><tspan  y="0" class="t0">
+</tspan>
+			<tspan x="0" y="104.4" class="t0"> </tspan><tspan  y="104.4" class="t0"> </tspan><tspan  y="104.4" class="t0"> </tspan><tspan  y="104.4" class="t0"> </tspan><tspan  y="104.4" class="t0">(</tspan><tspan  y="104.4" class="t0">s</tspan><tspan  y="104.4" class="t0">o</tspan><tspan  y="104.4" class="t0">r</tspan><tspan  y="104.4" class="t0">r</tspan><tspan  y="104.4" class="t0">y</tspan><tspan  y="104.4" class="t0">)</tspan><tspan  y="104.4" class="t0">
+</tspan>
+			<tspan x="0" y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0">:</tspan><tspan  y="208.8" class="t0">(</tspan><tspan  y="208.8" class="t0">
+</tspan>
+		</text>
+	</g>
 </svg>
