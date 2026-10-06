@@ -1,4 +1,4 @@
-# SPC 3000 
+# SPC 3000 (and [Pip-Boy OS](Software/README%20(Pip-Boy%20OS).md) )
 The Survival Personal Computer 3000 is an open-source post-apocalyptic forearm PC inspired by the *Pip-Boy* from *Fallout New Vegas*.
 
 <img width="717" height="467" alt="image" src="https://github.com/user-attachments/assets/46e5624c-05e2-4e9f-b137-e420c69d9e3c" />
