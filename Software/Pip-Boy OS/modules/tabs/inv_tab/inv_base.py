@@ -267,7 +267,7 @@ class InvBase:
 
                 if is_selected:
                     pygame.draw.rect(screen, pip_light, item_rect)
-                    text_color = pip_dark
+                    text_color = (0, 0, 0)
                     sq_color = pip_dark
                 else:
                     text_color = pip_light
@@ -416,10 +416,9 @@ class InvBase:
     
         surf = pygame.Surface((w, h), pygame.SRCALPHA).convert_alpha()
         color_light = getattr(settings, "PIP_BOY_LIGHT", (0, 255, 0))
-        color_middle = getattr(settings, "PIP_BOY_MIDDLE", (0, 191, 0))
 
         if not self.is_nv:
-            surf.fill(color_middle)
+            surf.fill(color_light)
             text_surf = self.inv_font.render("IMAGE NOT FOUND", True, (0, 0, 0))
         else:
             pygame.draw.rect(surf, color_light, surf.get_rect(), width=1)

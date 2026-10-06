@@ -9,6 +9,8 @@ from cpp import wireframe
 import os
 import pygame
 import settings
+import math
+import random
 
 VAULTBOY_CACHE = {}
 
@@ -400,19 +402,18 @@ class GenericList:
             y += item_h + spacing
 
 class ItemGrid:
-    def __init__(self, draw_space, font, padding=5, text_margin=0.5):
+    def __init__(self, draw_space, font, padding=5, text_margin=0.5, padding_x=5):
         self.draw_space = draw_space
         self.font = font
         self.line_height = self.font.get_height()
         self.padding = padding
+        self.padding_x = padding_x  # Padding dedicato per sinistra e destra
         self.precomputed_bg = []
         self.precomputed_text = []
         self.precomputed_divider = None  # Only one divider per grid
         self.top_margin = text_margin
         self.bottom_margin = text_margin * 2
         self.text_cache = {}  # New surface cache
-        
-
 
     def _get_rendered_text(self, text, color):
         key = (text, color)
@@ -420,30 +421,15 @@ class ItemGrid:
             self.text_cache[key] = self.font.render(text, True, color)
         return self.text_cache[key]
 
-
     def update(self, entries):
         """Prepare all rendering elements with proper alignment, adding a vertical divider if needed."""
         self.precomputed_bg = []
         self.precomputed_text = []
         self.precomputed_divider = None  # Reset divider each update
-        current_y = self.draw_space.bottom - settings.GRID_BOTTOM_MARGIN
         current_y = self.draw_space.top
-        """
-        current_y = self.draw_space.bottom - settings.GRID_BOTTOM_MARGIN
-        total_height = sum(
-            (
-                self.top_margin +
-                self.line_height +
-                (max(0, len(entry.get("lines", [])) - 1) * self.line_height) +
-                self.bottom_margin
-            ) + self.padding
-            for entry in entries
-        )
-
-        current_y -= total_height
-        current_y = max(current_y, self.draw_space.top)  # Clamp to top boundary
-        """
-        label_x = self.draw_space.left + self.padding
+        
+        # USA self.padding_x PER IL BORDO SINISTRO
+        label_x = self.draw_space.left + self.padding_x
 
         for entry in entries:
             if current_y >= self.draw_space.bottom:
@@ -454,7 +440,9 @@ class ItemGrid:
             label_y = current_y + self.top_margin
             icon_x = label_x
             icon_front_x = label_x
-            value_x = self.draw_space.right - self.padding
+            
+            # USA self.padding_x PER IL BORDO DESTRO
+            value_x = self.draw_space.right - self.padding_x
             
             if entry.get("icon_front") and "icon" in entry:
                 icon_surface = entry["icon"]
@@ -467,7 +455,6 @@ class ItemGrid:
             entry_lines.append(("label", label_surface, label_pos))
 
             value_y = label_y        
-
 
             if "lines" in entry:
                 for i, line in enumerate(entry["lines"]):
@@ -493,8 +480,6 @@ class ItemGrid:
                         icon_x -= component.get_width()
                         current_x += component.get_width() + self.padding
                         
-
-                
             if "value" in entry:
                 text_surface = self._get_rendered_text(str(entry["value"]), settings.PIP_BOY_LIGHT)
                 text_width = text_surface.get_width()
@@ -509,7 +494,7 @@ class ItemGrid:
             additional_lines = max(0, len(entry.get("lines", [])) - 1)
             entry_height = int(self.top_margin) + self.line_height + additional_lines * self.line_height + int(self.bottom_margin)
 
-            # Store background rectangle
+            # Store background rectangle (mantiene la larghezza intera)
             self.precomputed_bg.append((
                 pygame.Rect(
                     self.draw_space.left,
@@ -527,7 +512,7 @@ class ItemGrid:
             # Add vertical divider if needed (only one per grid)
             if self.precomputed_divider is None and entry.get("split") and icon_x is not None:
                 self.precomputed_divider = pygame.Rect(
-                    icon_x,  # Position divider left of the icon
+                    icon_x,
                     current_y,
                     self.padding,
                     entry_height
@@ -536,7 +521,6 @@ class ItemGrid:
             current_y += entry_height
             if entry != entries[-1]:  # Only add padding if it's not the last entry
                 current_y += self.padding
-
 
     def render(self, surface):
         # Draw backgrounds first
@@ -908,9 +892,74 @@ def draw_nv_ui(screen, player_data, current_tab="STATS", current_subtab=0):
             pygame.draw.line(screen, COLOR_NV, (margin_right, line_y - corner_tick_h), (margin_right, line_y), 1)
 
 def draw_rad_screen(screen, player_data, COLOR_NV, font, font_large, screen_w, screen_h):
-    """Renderizza il sotto-tab RAD con scala riallineata a sinistra e distanza triangolo-50 RAD corretta."""
-    rads = player_data.get('rads', getattr(settings, 'RADIATION_VALUE', 312))
+    """Renderizza il tab RAD con fluttuazione Statica o Dinamica in base a RADIATION_FLUCTUATION."""
+    base_rads = player_data.get('rads', getattr(settings, 'RADIATION_VALUE', 312))
     rad_resist = player_data.get('rad_resist', getattr(settings, 'RAD_RESIST', 6))
+    fluctuation_mode = getattr(settings, 'RADIATION_FLUCTUATION', 'static')
+
+    # =========================================================
+    # --- CONFIGURAZIONE PARAMETRI ---
+    # =========================================================
+    JITTER_AMPLITUDE = 6.0           # Vibrazione rapida della freccetta (micro-jitter)
+    JITTER_INTERVAL_MS = 60          # Velocità di vibrazione (ms)
+
+    MAX_RAD_CHANGE_PER_SEC = 15.0    # Velocità max di spostamento del valore medio (RAD/s)
+    TARGET_CHANGE_INTERVAL_MS = 3000 # Frequenza di cambio target in modalità dinamica
+
+    current_ticks = pygame.time.get_ticks()
+
+    # =========================================================
+    # --- CALCOLO VALORE MEDIO (STATICO VS DINAMICO) ---
+    # =========================================================
+    if str(fluctuation_mode).lower() in ['static']:
+        # --- MODALITÀ STATICA ---
+        # Il valore medio rimane ancorato a base_rads
+        current_mean = float(base_rads)
+        # Resettiamo lo stato dinamico se presente
+        if '_rad_state' in player_data:
+            del player_data['_rad_state']
+    else:
+        # --- MODALITÀ DINAMICA ---
+        # Il valore medio varia col tempo e orbita fino a coprire l'intero range 0 - 1000 RAD
+        if '_rad_state' not in player_data:
+            player_data['_rad_state'] = {
+                'current_mean': float(base_rads),
+                'target_mean': random.uniform(0.0, 1000.0),
+                'last_ticks': current_ticks,
+                'last_target_change': current_ticks
+            }
+
+        st = player_data['_rad_state']
+        dt = (current_ticks - st['last_ticks']) / 1000.0
+        st['last_ticks'] = current_ticks
+
+        # Selezione periodica di un nuovo target tra 0 e 1000
+        if current_ticks - st['last_target_change'] > TARGET_CHANGE_INTERVAL_MS:
+            st['target_mean'] = random.uniform(0.0, 1000.0)
+            st['last_target_change'] = current_ticks
+
+        # Spostamento graduale verso il nuovo target (max 15 RAD/sec)
+        diff = st['target_mean'] - st['current_mean']
+        if abs(diff) > 0.01:
+            max_step = MAX_RAD_CHANGE_PER_SEC * dt
+            step = max(-max_step, min(max_step, diff))
+            st['current_mean'] += step
+
+        current_mean = st['current_mean']
+
+    # =========================================================
+    # --- MICRO-JITTER E VALORE FINALE VISUALIZZATO ---
+    # =========================================================
+    jitter_seed = current_ticks // JITTER_INTERVAL_MS
+    jitter_rng = random.Random(jitter_seed)
+    micro_jitter = jitter_rng.uniform(-JITTER_AMPLITUDE, JITTER_AMPLITUDE)
+
+    display_rads = int(round(current_mean + micro_jitter))
+    display_rads = max(0, min(1000, display_rads))
+
+    # =========================================================
+    # --- RENDERING UI ---
+    # =========================================================
 
     # 1. RADAWAY / RAD-X
     quick_rad_items = player_data.get('quick_rad_items', ["(1) RadAway A)", "(3) Rad-X X)"])
@@ -927,11 +976,11 @@ def draw_rad_screen(screen, player_data, COLOR_NV, font, font_large, screen_w, s
     eff_top_y = 120
     eff_bottom_y = 170
 
-    # 2. RIQUADRO SUPERIORE "EFF"
-    if rads >= 800: rad_eff_str = "-3 END, -2 AGL, -2 STR"
-    elif rads >= 600: rad_eff_str = "-2 END, -2 AGL"
-    elif rads >= 400: rad_eff_str = "-2 END, -1 AGL"
-    elif rads >= 200: rad_eff_str = "-1 END"
+    # 2. RIQUADRO SUPERIORE "EFF" (basato sul valore medio visualizzato)
+    if current_mean >= 800: rad_eff_str = "-3 END, -2 AGL, -2 STR"
+    elif current_mean >= 600: rad_eff_str = "-2 END, -2 AGL"
+    elif current_mean >= 400: rad_eff_str = "-2 END, -1 AGL"
+    elif current_mean >= 200: rad_eff_str = "-1 END"
     else: rad_eff_str = "NONE"
 
     pygame.draw.line(screen, COLOR_NV, (center_x, eff_top_y), (right_x, eff_top_y), 1)
@@ -945,83 +994,72 @@ def draw_rad_screen(screen, player_data, COLOR_NV, font, font_large, screen_w, s
     # 3. LINEA DI SEPARAZIONE ORIZZONTALE
     pygame.draw.line(screen, COLOR_NV, (0, eff_bottom_y), (center_x - 5, eff_bottom_y), 1)
 
-    # 4. SEZIONE INFERIORE (RAD RESIST | DIVISORE VERTICALE | RADS METER)
+    # 4. SEZIONE INFERIORE
     bot_y = eff_bottom_y + 2
-
-    # Linea verticale divisoria
     pygame.draw.line(screen, COLOR_NV, (center_x - 5, eff_bottom_y), (center_x - 5, eff_bottom_y + 20), 1)
 
-    # RAD RESIST (A sinistra)
+    # RAD RESIST
     rr_label = font.render("RAD RESIST", True, COLOR_NV)
     rr_val = font.render(f"{rad_resist}%", True, COLOR_NV)
     screen.blit(rr_label, (10, bot_y))
     screen.blit(rr_val, rr_val.get_rect(right=center_x - 10, top=bot_y))
 
-    # RADS (A destra)
+    # RADS
     rads_label = font.render("RADS", True, COLOR_NV)
     rads_x = center_x 
     screen.blit(rads_label, (rads_x, bot_y))
 
     # =========================================================
-    # --- SCALA GRADUATA RIALLINEATA ---
+    # --- SCALA GRADUATA & INDICATORE ---
     # =========================================================
-    # Spostamento scala a sinistra di 8px
     meter_x1 = rads_x + rads_label.get_width() + 10
-    meter_x2 = right_x - 8
+    meter_x2 = right_x - 3
     meter_y = eff_bottom_y
     meter_w = max(10, meter_x2 - meter_x1)
 
-    # Linea orizzontale della scala radiazioni e bordo verticale destro
+    # Linee di fondo
     pygame.draw.line(screen, COLOR_NV, (center_x, meter_y), (right_x, meter_y), 1)
     pygame.draw.line(screen, COLOR_NV, (right_x, eff_bottom_y), (right_x, eff_bottom_y + 20), 1)
 
-    # NUMERI 500 E 1000 (SOPRA LA LINEA)
+    # NUMERI 500 E 1000
     lbl_500 = font.render("500", True, COLOR_NV)
     lbl_1000 = font.render("1000", True, COLOR_NV)
     screen.blit(lbl_500, lbl_500.get_rect(center=(meter_x1 + meter_w // 2, meter_y - 7)))
     screen.blit(lbl_1000, lbl_1000.get_rect(right=meter_x2, bottom=meter_y - 2))
 
-    # TRIANGOLI AGLI ESTREMI
-    # 0 RAD (Sinistra: arretrato di 2px extra per dare respiro al tick dei 50 RAD)
-    tri_0 = [
-        (meter_x1 - 5, meter_y),
-        (meter_x1, meter_y),
-        (meter_x1, meter_y + 6)
-    ]
+    # TRIANGOLI ESTREMI (0 e 1000)
+    tri_0 = [(meter_x1 - 5, meter_y), (meter_x1, meter_y), (meter_x1, meter_y + 6)]
     pygame.draw.polygon(screen, COLOR_NV, tri_0)
 
-    # 1000 RAD (Destra)
-    tri_1000 = [
-        (meter_x2 + 3, meter_y),
-        (meter_x2 - 2, meter_y),
-        (meter_x2 - 2, meter_y + 6)
-    ]
+    tri_1000 = [(right_x, meter_y), (meter_x2 - 2, meter_y), (meter_x2 - 2, meter_y + 6)]
     pygame.draw.polygon(screen, COLOR_NV, tri_1000)
 
-    # TACCHE LUNGHE (4 tacche: 200, 400, 600, 800 RAD)
-    long_ticks = [200, 400, 600, 800]
-    for val in long_ticks:
+    # TACCHE LUNGHE
+    for val in [200, 400, 600, 800]:
         tx = meter_x1 + int((val / 1000.0) * meter_w)
         pygame.draw.line(screen, COLOR_NV, (tx, meter_y), (tx, meter_y + 7), 1)
 
-    # TACCHE CORTE (10 tacche: 50, 150, 250, 350, 450, 550, 650, 750, 850, 950 RAD)
-    short_ticks = [50, 150, 250, 350, 450, 550, 650, 750, 850, 950]
-    for val in short_ticks:
+    # TACCHE CORTE
+    for val in [50, 150, 250, 350, 450, 550, 650, 750, 850, 950]:
         tx = meter_x1 + int((val / 1000.0) * meter_w)
         pygame.draw.line(screen, COLOR_NV, (tx, meter_y), (tx, meter_y + 4), 1)
 
-    # INDICATORE VALORE ATTUALE + FRECCIA VETTORIALE
-    clamped_rads = max(0, min(1000, rads))
-    indicator_x = meter_x1 + int((clamped_rads / 1000.0) * meter_w)
+    # POSIZIONAMENTO INDICATORE
+    RIGHT_ALIGN_OFFSET = 2  
+    effective_x2 = meter_x2 - RIGHT_ALIGN_OFFSET
+    effective_w = effective_x2 - meter_x1
 
-    # 1. Numero Radiazioni (posizionato a sinistra della freccia)
-    ind_txt = font.render(f"{rads}", True, COLOR_NV)
+    # Calcolo posizione X esatta
+    indicator_x = meter_x1 + int((display_rads / 1000.0) * effective_w)
+    indicator_x = max(meter_x1, min(effective_x2, indicator_x))
+
+    # Testo del valore
+    ind_txt = font.render(f"{display_rads}", True, COLOR_NV)
     screen.blit(ind_txt, ind_txt.get_rect(right=indicator_x - 5, top=meter_y + 15))
 
-    # 2. Freccia
+    # Freccia
     arrow_top_y = meter_y + 9
     arrow_bot_y = meter_y + 22
-    
     head_pts = [
         (indicator_x, arrow_top_y), 
         (indicator_x - 4, arrow_top_y + 5), 
@@ -1029,7 +1067,16 @@ def draw_rad_screen(screen, player_data, COLOR_NV, font, font_large, screen_w, s
     ]
     pygame.draw.polygon(screen, COLOR_NV, head_pts)
     pygame.draw.line(screen, COLOR_NV, (indicator_x, arrow_top_y), (indicator_x, arrow_bot_y + 7), 1)
-
+    # Freccia
+    arrow_top_y = meter_y + 9
+    arrow_bot_y = meter_y + 22
+    head_pts = [
+        (indicator_x, arrow_top_y), 
+        (indicator_x - 4, arrow_top_y + 5), 
+        (indicator_x + 4, arrow_top_y + 5)
+    ]
+    pygame.draw.polygon(screen, COLOR_NV, head_pts)
+    pygame.draw.line(screen, COLOR_NV, (indicator_x, arrow_top_y), (indicator_x, arrow_bot_y + 7), 1)
 
 def draw_eff_screen(screen, player_data, COLOR_NV, font, font_large, screen_w, screen_h):
     """Renderizza il sotto-tab EFF senza la linea di chiusura finale."""

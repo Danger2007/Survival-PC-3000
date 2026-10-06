@@ -175,7 +175,6 @@ class TabManager:
                         (0, self.tab_font_height), (settings.SCREEN_WIDTH, self.tab_font_height), 1)
         pygame.draw.line(self.header_background, settings.PIP_BOY_LIGHT,
                         (0, settings.TAB_SCREEN_EDGE_LENGTH + self.tab_font_height), (0, self.tab_font_height), 1)
-        
         pygame.draw.line(self.header_background, settings.PIP_BOY_LIGHT,
                         (settings.SCREEN_WIDTH-1, self.tab_font_height + settings.TAB_SCREEN_EDGE_LENGTH), 
                         (settings.SCREEN_WIDTH-1, self.tab_font_height ), 1)
@@ -214,9 +213,9 @@ class TabManager:
             total_widths = []
             self.subtab_offsets[tab_name] = []
             
-            for subtab in subtabs:
+            for subtab in subtabs: #Draw active and inactive surfaces for each subtab in the header of fallout 4
                 active = self.main_tab_font.render(subtab, True, settings.PIP_BOY_LIGHT)
-                inactive = self.main_tab_font.render(subtab, True, settings.PIP_BOY_DARK)
+                inactive = self.main_tab_font.render(subtab, True, settings.PIP_BOY_MID)
                 active_surfaces.append(active)
                 inactive_surfaces.append(inactive)
                 total_widths.append(active.get_width())
@@ -454,10 +453,19 @@ class TabManager:
         else:
             self.draw_original_f4_footer(current_tab_instance)
 
-    def draw_original_f4_footer(self, current_tab_instance=None):
+    def get_current_tab_instance(self):
+        match self.current_tab_index:
+            case 0: return self.stat_tab
+            case 1: return self.inv_tab
+            case 2: return self.data_tab
+            case 3: return self.map_tab
+            case 4: return self.radio_tab
+            case _: return self.stat_tab
+            
+    def draw_original_f4_footer(self):
         if hasattr(self, 'tab_base') and hasattr(self.tab_base, 'render_footer'):
-            target_tab = current_tab_instance or self.tabs[self.current_tab_index]
-            self.tab_base.render_footer(target_tab)
+            current_tab = self.get_current_tab_instance() 
+            self.tab_base.render_footer(current_tab)
 
     def render_sub_tabs(self):
         """Draw pre-rendered subtab bar"""

@@ -22,14 +22,17 @@ from util_functs import Utils
 
 EDITABLE_SETTINGS = [
     'PLAYER_NAME', 'HP_MAX', 'HP_CURRENT', 'AP_MAX', 'AP_CURRENT', 'LEVEL',
+    'RADIATION_VALUE', 'RADIATION_FLUCTUATION',
     'PIP_BOY_LIGHT', 'PIP_BOY_MID', 'PIP_BOY_DARK', 'PIP_BOY_DARKER',
     'SCREEN_WIDTH', 'SCREEN_HEIGHT', 'FPS', 'SOUND_ON', 'SHOW_CRT', 'BLOOM_EFFECT',
-    'REAL_MAP', 'FM_RADIO', 'FAKE_LOCATION', 'UI_STYLE', 'SHOW_ALL_MARKERS'
+    'REAL_MAP', 'FM_RADIO', 'FAKE_LOCATION', 'UI_STYLE', 'SHOW_ALL_MARKERS', 'DATE_MODE'
 ]
 
 CYCLE_OPTIONS = {
     'UI_STYLE': ['Fallout_4', 'Fallout_NV'],
-    'FAKE_LOCATION': ['Commonwealth', 'Mojave']
+    'FAKE_LOCATION': ['Commonwealth', 'Mojave'],
+    'DATE_MODE': ['Game', 'Real'],
+    'RADIATION_FLUCTUATION': ['Static', 'Dynamic']
 }
 
 class SettingsTab:
@@ -327,7 +330,12 @@ class SettingsTab:
             return True
 
         if self.editing_mode == 'INT':
-            step = 10 if ('WIDTH' in self.editing_var['var_name'] or 'HEIGHT' in self.editing_var['var_name']) else 1
+            var_name = self.editing_var['var_name']
+            if any(k in var_name for k in ['WIDTH', 'HEIGHT', 'RADIATION']):
+                step = 10
+            else:
+                step = 1
+
             self.editing_value += step if is_up else -step
             return True
 

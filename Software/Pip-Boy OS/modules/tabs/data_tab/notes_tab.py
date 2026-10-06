@@ -274,7 +274,7 @@ class NotesTab:
 
     def render(self):
         color_light = getattr(settings, "PIP_BOY_LIGHT", (0, 255, 0))
-        color_middle = getattr(settings, "PIP_BOY_MIDDLE", (0, 191, 0))
+        color_middle = getattr(settings, "PIP_BOY_MIDDLE", (0, 127, 0))
         bg_dark = (0, 0, 0)
 
         visible_notes = self._get_sorted_visible_notes()
@@ -427,10 +427,8 @@ class NotesTab:
             item_rect = pygame.Rect(self.list_rect.left + text_offset_x - 3, y_cursor, self.list_rect.width - text_offset_x + 3, item_h)
 
             if i == self.selected_index:
-                highlight_surf = pygame.Surface((item_rect.width, item_rect.height), pygame.SRCALPHA)
-                alpha = 200 if not self.focus_on_desc else 100
-                highlight_surf.fill((*color_light[:3], alpha))
-                self.screen.blit(highlight_surf, item_rect.topleft)
+                # 1. Disegno diretto e opaco del rettangolo (nessuna Surface SRCALPHA/trasparenza)
+                pygame.draw.rect(self.screen, color_light, item_rect)
                 text_color = bg_dark if not self.focus_on_desc else color_light
             else:
                 text_color = color_light if note.get("active", True) else color_middle

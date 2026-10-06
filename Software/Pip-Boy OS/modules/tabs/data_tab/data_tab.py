@@ -1,10 +1,12 @@
 from datetime import datetime
+from threading import Thread, Lock
 import pygame
 from .quest_tab import QuestsTab
 from .notes_tab import NotesTab
 from .settings_tab import SettingsTab
 from .workshops_tab import WorkshopsTab
 from .stats_tab import StatsTab
+from util_functs import Utils
 from tab import ThreadHandler
 import settings
 
@@ -20,6 +22,8 @@ class DataTab:
     
         self.footer_font = tab_instance.footer_font
         self.font_small = pygame.font.Font(settings.ROBOTO_BOLD_PATH, 11)
+        self.date = Utils.get_date()
+        self.time = Utils.get_time()
         
         self.tab_instance.init_footer(
             self, 
@@ -43,8 +47,32 @@ class DataTab:
         
         self.sub_tab_thread_handler = ThreadHandler(sub_tab_map, self.current_sub_tab_index)
 
+        # Thread per l'aggiornamento dinamico dell'orario
+        self.footer_time_thread = Thread(target=self.update_footer_time, daemon=True)
+        self.footer_time_thread.start()
+
+    def _blit_footer_time(self):
+        time_surface = self.footer_font.render(self.time, True, settings.PIP_BOY_LIGHT)
+        self.tab_instance.update_footer(self, time_surface, (settings.SCREEN_WIDTH // 4 + 4, 2))
+
+    def update_footer_time(self):
+        while True:
+            self.time = Utils.get_time()
+            self._blit_footer_time()
+            now = datetime.now()
+            wait_time = 60 - now.second
+            pygame.time.wait(wait_time * 1000)
+
     def _init_footer_text(self):
-        footer_surface = pygame.Surface((settings.SCREEN_WIDTH, settings.BOTTOM_BAR_HEIGHT), pygame.SRCALPHA).convert_alpha()
+        footer_surface = pygame.Surface((settings.SCREEN_WIDTH, settings.BOTTOM_BAR_HEIGHT), pygame.SRCALPHA)
+        date_surface = self.footer_font.render(self.date, True, settings.PIP_BOY_LIGHT)
+        location_surface = self.footer_font.render(
+            settings.FAKE_LOCATION if getattr(settings, 'GAME_ACCURATE_MODE', False) else getattr(settings, 'REAL_LOCATION', ''), 
+            True, 
+            settings.PIP_BOY_LIGHT
+        )
+        footer_surface.blit(date_surface, (2, 2))
+        footer_surface.blit(location_surface, (settings.SCREEN_WIDTH - location_surface.get_width() - 2, 2))
         return footer_surface
 
     def get_active_subtab(self):
@@ -71,7 +99,6 @@ class DataTab:
         ui_style = str(getattr(settings, 'UI_STYLE', 'fallout_4')).lower()
         is_nv = any(k in ui_style for k in ['nv', 'new_vegas', 'newvegas', 'fnv'])
 
-        # Se siamo in modalità Fallout: New Vegas, salta WORKSHOPS (1) e STATS (2)
         if is_nv and sub_tab in (1, 2):
             return
 
@@ -92,40 +119,11 @@ class DataTab:
     def handle_threads(self, tab_selected: bool):
         self.sub_tab_thread_handler.update_tab_index(self.current_sub_tab_index)
 
-    def _render_system_datetime(self):
-        color_light = getattr(settings, "PIP_BOY_LIGHT", (0, 255, 0))
-        ui_style = str(getattr(settings, 'UI_STYLE', 'fallout_4')).lower()
-        is_nv = any(k in ui_style for k in ['nv', 'new_vegas', 'newvegas', 'fnv'])
-
-        now = datetime.now()
-        date_str = now.strftime("%m.%d.%Y")
-        time_str = now.strftime("%I:%M %p")
-
-        date_surf = self.font_small.render(date_str, True, color_light)
-        time_surf = self.font_small.render(time_str, True, color_light)
-
-        bottom_bar_h = getattr(settings, 'BOTTOM_BAR_HEIGHT', 25)
-        footer_top = settings.SCREEN_HEIGHT - bottom_bar_h
-        cell_width = settings.SCREEN_WIDTH // 3
-
-        pos_y = footer_top + (bottom_bar_h - date_surf.get_height()) // 2
-        date_x = 6
-        time_x = cell_width + 6
-
-        if is_nv:
-            pos_y -= 20
-        else:
-            time_x -= 30
-
-        self.screen.blit(date_surf, (date_x, pos_y))
-        self.screen.blit(time_surf, (time_x, pos_y))
-
     def render(self):
         self.tab_instance.render_footer(self)
         active = self.get_active_subtab()
         if active and hasattr(active, 'render'):
             active.render()
-        self._render_system_datetime()
 
     def toggle_focus(self):
         active = self.get_active_subtab()

@@ -1,12 +1,11 @@
-# radio_tab/radio_tab.py
 import random
 import time
 import pygame
+from datetime import datetime
 from threading import Thread
 import settings
 import os
 from util_functs import Utils
-
 from .radio_station_loader import RadioStationLoader
 from .playlist_manager import PlaylistManager
 from .visualizer import Visualizer
@@ -19,7 +18,14 @@ class RadioTab:
         self.tab_instance = tab_instance
         self.draw_space = draw_space
 
-        self.tab_instance.init_footer(self)
+        self.date = Utils.get_date()
+        self.time = Utils.get_time()
+
+        self.tab_instance.init_footer(
+            self, 
+            (settings.SCREEN_WIDTH // 4, settings.SCREEN_WIDTH // 4), 
+            self._init_footer_text()
+        )
         self.main_font = pygame.font.Font(settings.ROBOTO_BOLD_PATH, 12)
         
         list_draw_space = pygame.Rect(
@@ -45,7 +51,6 @@ class RadioTab:
         self.stations_loaded = False
         self.pending_station_names = []
 
-        # Determinazione della cartella in base allo stile se RADIO_TYPE è FILES
         radio_type = getattr(settings, 'RADIO_TYPE', 'FILES').upper()
         
         if radio_type == 'FILES':
@@ -56,7 +61,6 @@ class RadioTab:
             else:
                 radio_folder = settings.RADIO_BASE_FOLDER
         elif radio_type == 'FM':
-            # Predisposizione per il modulo FM hardware
             radio_folder = settings.RADIO_BASE_FOLDER
         else:
             radio_folder = settings.RADIO_BASE_FOLDER
@@ -65,18 +69,43 @@ class RadioTab:
         self.playlist_manager = PlaylistManager()
         self.visualizer = Visualizer(self.draw_space, self.screen, self)
 
+        # Thread per orario nel footer
+        self.footer_time_thread = Thread(target=self.update_footer_time, daemon=True)
+        self.footer_time_thread.start()
+
         Thread(target=self.load_radio_stations, daemon=True).start()
         Thread(target=self.update_radio_music, daemon=True).start()
+
+    def _blit_footer_time(self):
+        time_surface = self.tab_instance.footer_font.render(self.time, True, settings.PIP_BOY_LIGHT)
+        self.tab_instance.update_footer(self, time_surface, (settings.SCREEN_WIDTH // 4 + 4, 2))
+
+    def update_footer_time(self):
+        while True:
+            self.time = Utils.get_time()
+            self._blit_footer_time()
+            now = datetime.now()
+            wait_time = 60 - now.second
+            pygame.time.wait(wait_time * 1000)
+
+    def _init_footer_text(self):
+        footer_surface = pygame.Surface((settings.SCREEN_WIDTH, settings.BOTTOM_BAR_HEIGHT), pygame.SRCALPHA)
+        date_surface = self.tab_instance.footer_font.render(self.date, True, settings.PIP_BOY_LIGHT)
+        location_surface = self.tab_instance.footer_font.render(
+            settings.FAKE_LOCATION if getattr(settings, 'GAME_ACCURATE_MODE', False) else getattr(settings, 'REAL_LOCATION', ''), 
+            True, 
+            settings.PIP_BOY_LIGHT
+        )
+        footer_surface.blit(date_surface, (2, 2))
+        footer_surface.blit(location_surface, (settings.SCREEN_WIDTH - location_surface.get_width() - 2, 2))
+        return footer_surface
 
     def load_radio_stations(self):
         radio_type = getattr(settings, 'RADIO_TYPE', 'FILES').upper()
 
         if radio_type == 'FILES':
-            # Carica unicamente la cartella selezionata in __init__ (senza mischiare)
             self.loader.load_radio_stations()
         elif radio_type == 'FM':
-            # Esempio di predisposizione per radio hardware FM
-            # self.loader.load_fm_stations()
             pass
 
         self.pending_station_names = list(self.loader.radio_stations.keys())
@@ -96,7 +125,6 @@ class RadioTab:
         self.station_list.change_selection(direction)
 
     def handle_input(self, event):
-        """Gestisce lo scorrimento e la selezione delle stazioni via tastiera/input."""
         if event.type == pygame.KEYDOWN:
             if event.key in (pygame.K_UP, pygame.K_w):
                 self.scroll(True)
@@ -217,7 +245,6 @@ class RadioTab:
         self.visualizer.render()
 
     def render(self):
-        # Sincronizzazione sicura nell'event loop principale di Pygame
         if self.stations_loaded and self.pending_station_names:
             if hasattr(self.station_list, 'set_items'):
                 self.station_list.set_items(self.pending_station_names)

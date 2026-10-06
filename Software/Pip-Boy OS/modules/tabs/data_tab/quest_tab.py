@@ -64,7 +64,7 @@ class QuestsTab:
                     {"text": "(Optional) Assess Paladin Danse's condition", "done": False, "current": False},
                     {"text": "(Optional) Activate the engine core's rocket", "done": False, "current": False},
                     {"text": "Locate DRT", "done": False, "current": False},
-                    {"text": "Door opened, trigger synth ambush", "done": False, "current": True},
+                    {"text": "Door opened, trigger synth ambush", "done": False, "current": False},
                     {"text": "Found synth evidence", "done": False, "current": False},
                     {"text": "Arrive at ArcJet - Get inside", "done": False, "current": False},
                     {"text": "Follow Paladin Danse", "done": False, "current": False},
@@ -590,7 +590,7 @@ class QuestsTab:
 
             if is_current and not is_step_selected:
                 bg_surf = pygame.Surface((row_rect.width, row_rect.height))
-                bg_surf.fill(color_middle)
+                bg_surf.fill(color_light)
                 self.screen.blit(bg_surf, row_rect.topleft)
                 text_col = (0, 0, 0)
             elif is_step_selected:
@@ -598,7 +598,8 @@ class QuestsTab:
                 text_col = (0, 0, 0)
             else:
                 bg_surf = pygame.Surface((row_rect.width, row_rect.height), pygame.SRCALPHA)
-                bg_surf.fill((10, 25, 10, 190))
+                dark_color = getattr(settings, 'PIP_BOY_DARK', (0, 30, 0))
+                bg_surf.fill(dark_color)
                 self.screen.blit(bg_surf, row_rect.topleft)
                 text_col = color_light
 

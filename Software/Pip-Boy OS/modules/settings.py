@@ -64,6 +64,7 @@ LIST_TOP_MARGIN = 10
 # ------------------
 RASPI = False 
 SPEED = 1
+DATE_MODE = "Game" # I didn't use a boolean because I could make customizable dates in the future (date customization trough settings_tab and configure)
 GAME_ACCURATE_MODE = False
 YEARS_ADDED = 263
 
@@ -76,23 +77,18 @@ FPS = 24
 FULLSCREEN = True if RASPI else False 
 BACKGROUND = (0, 0, 0)
 PIP_BOY_LIGHT = (0, 255, 0)
-try:
-    from modules.user_config import *
-except ImportError:
-    try:
-        from user_config import *
-    except ImportError:
-        pass
+# Ricalcola sempre i colori scuri in base a PIP_BOY_LIGHT corrente
 if 'PIP_BOY_LIGHT' in globals():
-    PIP_BOY_MIDDLE = (int(PIP_BOY_LIGHT[0] * 0.75), int(PIP_BOY_LIGHT[1] * 0.75), int(PIP_BOY_LIGHT[2] * 0.75))
-    PIP_BOY_DARKER = (int(PIP_BOY_LIGHT[0] * 0.5), int(PIP_BOY_LIGHT[1] * 0.5), int(PIP_BOY_LIGHT[2] * 0.5))
-    PIP_BOY_DARK = PIP_BOY_DARKER
-else:
-    PIP_BOY_MIDDLE= (int(PIP_BOY_LIGHT[0] * 0.75), int(PIP_BOY_LIGHT[1] * 0.75), int(PIP_BOY_LIGHT[2] * 0.75))
-    PIP_BOY_MID = PIP_BOY_MIDDLE
-    PIP_BOY_DARK = (int(PIP_BOY_LIGHT[0] * 0.5), int(PIP_BOY_LIGHT[1] * 0.5), int(PIP_BOY_LIGHT[2] * 0.5))
+    PIP_BOY_MID = (int(PIP_BOY_LIGHT[0] * 0.5), int(PIP_BOY_LIGHT[1] * 0.5), int(PIP_BOY_LIGHT[2] * 0.5))
+    PIP_BOY_MIDDLE = PIP_BOY_MID
+    PIP_BOY_DARK = (int(PIP_BOY_LIGHT[0] * 0.25), int(PIP_BOY_LIGHT[1] * 0.25), int(PIP_BOY_LIGHT[2] * 0.25))
     PIP_BOY_DARKER = PIP_BOY_DARK
-
+else:
+    PIP_BOY_LIGHT = (0, 255, 0)
+    PIP_BOY_MID = (0, 127, 0)
+    PIP_BOY_MIDDLE = PIP_BOY_MID
+    PIP_BOY_DARK = (0, 63, 0)
+    PIP_BOY_DARKER = PIP_BOY_DARK
 # ------------------
 # Audio Settings
 # ------------------
@@ -124,7 +120,8 @@ HP_MAX = 120
 HP_CURRENT = 100
 AP_MAX = 90
 AP_CURRENT = 90
-RADIATION_CURRENT = 0 # percentage of hp
+RADIATION_FLUCTUATION = 'Static'
+RADIATION_CURRENT = 50 # percentage of hp
 RADIATION_VALUE = RADIATION_CURRENT * 10
 LEVEL = 28
 XP_CURRENT = 39

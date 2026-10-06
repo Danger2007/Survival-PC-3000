@@ -1,15 +1,17 @@
 import pygame
 import settings
+from ui import ItemGrid
 
 
-class StatsTab:
+class StatTab:
     def __init__(self, screen, tab_instance, draw_space: pygame.Rect):
         self.screen = screen
         self.tab_instance = tab_instance
         self.draw_space = draw_space
 
-        self.font = pygame.font.Font(settings.ROBOTO_BOLD_PATH, 14)
-        self.font_small = pygame.font.Font(settings.ROBOTO_BOLD_PATH, 12)
+        # Font ridimensionati per matchare l'interfaccia principale del Pip-Boy
+        self.font = pygame.font.Font(settings.ROBOTO_BOLD_PATH, 10)
+        self.font_small = pygame.font.Font(settings.ROBOTO_BOLD_PATH, 9)
 
         # Categorie e relative statistiche
         self.categories = [
@@ -71,58 +73,79 @@ class StatsTab:
 
         self.selected_category = 0
 
+        # --- CALCOLO DIVISIONE E PADDING ORIZZONTALE ---
+        left_w = int((self.draw_space.width + 15) / 2)  # Spazio tra elenchi invariato
+        
+        # Aggiungiamo 5px a sinistra e togliamo 10px totali dalla larghezza (5px a sx + 5px a dx)
+        padding_x = 5
+        grid_left = self.draw_space.left + left_w + padding_x
+        grid_top = self.draw_space.top + 8
+        grid_width = (self.draw_space.right - padding_x) - grid_left
+        grid_height = self.draw_space.height - 16
+        
+        grid_rect = pygame.Rect(grid_left, grid_top, grid_width, grid_height)
+
+        self.item_grid = ItemGrid(
+            draw_space=grid_rect,
+            font=self.font,
+            padding=1  # Lasciamo il padding verticale di ItemGrid inalterato
+        )
+        self._update_grid()
+
+    def _update_grid(self):
+        """Aggiorna le voci della griglia in base alla categoria selezionata."""
+        if 0 <= self.selected_category < len(self.categories):
+            selected_cat = self.categories[self.selected_category]
+            entries = [{"label": k, "value": v} for k, v in selected_cat["stats"]]
+            if self.item_grid:
+                self.item_grid.update(entries)
+
     def scroll(self, direction: bool):
-        """Scroll tra le categorie di statistiche"""
-        if direction:  # Giù
-            if self.selected_category < len(self.categories) - 1:
-                self.selected_category += 1
-        else:  # Su
+        """Scroll tra le categorie di statistiche (Invertito: True -> Su, False -> Giù)"""
+        prev_index = self.selected_category
+        if direction:  # Su
             if self.selected_category > 0:
                 self.selected_category -= 1
+        else:  # Giù
+            if self.selected_category < len(self.categories) - 1:
+                self.selected_category += 1
+
+        if prev_index != self.selected_category:
+            self._update_grid()
 
     def select_item(self):
         return True
 
     def render(self):
-        left_margin = self.draw_space.left - 10
-        item_h = 24
+        left_margin = self.draw_space.left
+        row_h = self.font.get_linesize() + 6
 
-        # --- PANNELLO SINISTRO (Categorie Statistiche) ---
-        left_w = int(self.draw_space.width * 0.40)
-        y = self.draw_space.top
+        # --- PANNELLO SINISTRO ---
+        left_w = int((self.draw_space.width + 15) / 2)
+        y = self.draw_space.top + 8
+
+        pip_light = getattr(settings, 'PIP_BOY_LIGHT', (0, 255, 0))
 
         for idx, cat in enumerate(self.categories):
-            item_rect = pygame.Rect(left_margin, y, left_w, item_h)
+            item_rect = pygame.Rect(left_margin, y, left_w, row_h - 2)
 
             if idx == self.selected_category:
-                pygame.draw.rect(self.screen, settings.PIP_BOY_LIGHT, item_rect)
-                text_color = settings.BACKGROUND
+                pygame.draw.rect(self.screen, pip_light, item_rect)
+                text_color = (0, 0, 0)
             else:
-                text_color = settings.PIP_BOY_LIGHT
+                text_color = pip_light
 
+            # Scritta elenco sinistro (spostata di 5px verso destra dal margine base 6px -> 11px)
             cat_surf = self.font.render(cat["name"], True, text_color)
-            self.screen.blit(cat_surf, (left_margin + 8, y + 3))
+            cat_rect = cat_surf.get_rect(midleft=(left_margin + 11, item_rect.centery))
+            self.screen.blit(cat_surf, cat_rect)
 
-            y += item_h + 2
+            y += row_h
 
-        # --- PANNELLO DESTRO (Dettaglio Statistiche) ---
-        selected_cat = self.categories[self.selected_category]
-        right_x = left_margin + left_w + 20
-        right_y = self.draw_space.top
+        # --- PANNELLO DESTRO (Griglia Statistiche) ---
+        if self.item_grid:
+            self.item_grid.render(self.screen)
 
-        for stat_name, stat_val in selected_cat["stats"]:
-            lbl_surf = self.font.render(stat_name, True, settings.PIP_BOY_LIGHT)
-            val_surf = self.font.render(str(stat_val), True, settings.PIP_BOY_LIGHT)
 
-            self.screen.blit(lbl_surf, (right_x, right_y))
-
-            # Allineamento valore a destra
-            val_x = self.draw_space.right + 10 - val_surf.get_width()
-            self.screen.blit(val_surf, (val_x, right_y))
-
-            right_y += 20
-
-        # Freccetta di indicazione scorrimento in basso a destra
-        if len(selected_cat["stats"]) > 8:
-            arrow_surf = self.font_small.render("v", True, settings.PIP_BOY_LIGHT)
-            self.screen.blit(arrow_surf, (self.draw_space.right, self.draw_space.bottom - 15))
+# Alias per garantire retrocompatibilità con TabManager
+StatsTab = StatTab
