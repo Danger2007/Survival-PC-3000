@@ -111,7 +111,6 @@ def draw_vaultboy_and_cnd(screen, player_data, center_x, center_y, color):
         elif hp_pct >= 0.2: face_idx = 4
         else: face_idx = 5
 
-        # Disegna in quest'ordine per sovrapposizioni corrette
         layers = ['torso', 'leg_l', 'leg_r', 'arm_l', 'arm_r', 'head']
 
         for part in layers:
@@ -773,7 +772,7 @@ def draw_nv_ui(screen, player_data, current_tab="STATS", current_subtab=0):
         curr_right = box_left - spacing_between_boxes
 
     # ======================================================
-    # --- 2. LATERAL SUBMENÙ OF STATUS (CND / RAD / EFF) ---
+    # --- 2. LATERAL SUBMENU OF STATUS (CND / RAD / EFF) ---
     # ======================================================
     if tab_name in ["STAT", "STATS"] and current_subtab == 0:
         side_options = ["CND", "RAD", "EFF"]
@@ -786,14 +785,14 @@ def draw_nv_ui(screen, player_data, current_tab="STATS", current_subtab=0):
             screen.blit(txt, (11, side_y))
             side_y += 20
 
-        vb_center_x = screen_w // 2 - 10
-        vb_center_y = screen_h // 2 - 5
-
-        # Gestione dei 3 Sotto-Tab Laterali:
+        # Rendering specifico per la scheda CND
         if status_side_index == 0:
-            # Schermata CND (Vault Boy + Condizione Arti + Quick Items)
+            # 1. Vault Boy e barre arti
+            vb_center_x = screen_w // 2 - 10
+            vb_center_y = screen_h // 2 - 5
             draw_vaultboy_and_cnd(screen, player_data, vb_center_x, vb_center_y, COLOR_NV)
-            
+
+            # 2. TESTI A DESTRA (Stimpak / Doctor's Bag)
             quick_items = player_data.get('quick_items', ["(5) Stimpak S)", "(3) Doctor's Bag E)"]) if isinstance(player_data, dict) else ["(5) Stimpak S)", "(3) Doctor's Bag E)"]
             item_y = 45
             for item_str in quick_items:
@@ -801,14 +800,6 @@ def draw_nv_ui(screen, player_data, current_tab="STATS", current_subtab=0):
                 item_rect = item_txt.get_rect(right=screen_w - 20, top=item_y)
                 screen.blit(item_txt, item_rect)
                 item_y += 37
-
-        elif status_side_index == 1:
-            # Schermata RAD (Radiazioni completa con scala e freccia)
-            draw_rad_screen(screen, player_data, COLOR_NV, font, font_large, screen_w, screen_h)
-
-        elif status_side_index == 2:
-            # Schermata EFF (Lista effetti attivi completa)
-            draw_eff_screen(screen, player_data, COLOR_NV, font, font_large, screen_w, screen_h)
 
     # =================================
     # --- 3. FOOTER (LOWER SUBMENU) ---
@@ -891,251 +882,3 @@ def draw_nv_ui(screen, player_data, current_tab="STATS", current_subtab=0):
                 pygame.draw.line(screen, COLOR_NV, (seg_start_x, line_y), (margin_right, line_y), 1)
             pygame.draw.line(screen, COLOR_NV, (margin_right, line_y - corner_tick_h), (margin_right, line_y), 1)
 
-def draw_rad_screen(screen, player_data, COLOR_NV, font, font_large, screen_w, screen_h):
-    """Renderizza il tab RAD con fluttuazione Statica o Dinamica in base a RADIATION_FLUCTUATION."""
-    base_rads = player_data.get('rads', getattr(settings, 'RADIATION_VALUE', 312))
-    rad_resist = player_data.get('rad_resist', getattr(settings, 'RAD_RESIST', 6))
-    fluctuation_mode = getattr(settings, 'RADIATION_FLUCTUATION', 'static')
-
-    # =========================================================
-    # --- CONFIGURAZIONE PARAMETRI ---
-    # =========================================================
-    JITTER_AMPLITUDE = 6.0           # Vibrazione rapida della freccetta (micro-jitter)
-    JITTER_INTERVAL_MS = 60          # Velocità di vibrazione (ms)
-
-    MAX_RAD_CHANGE_PER_SEC = 15.0    # Velocità max di spostamento del valore medio (RAD/s)
-    TARGET_CHANGE_INTERVAL_MS = 3000 # Frequenza di cambio target in modalità dinamica
-
-    current_ticks = pygame.time.get_ticks()
-
-    # =========================================================
-    # --- CALCOLO VALORE MEDIO (STATICO VS DINAMICO) ---
-    # =========================================================
-    if str(fluctuation_mode).lower() in ['static']:
-        # --- MODALITÀ STATICA ---
-        # Il valore medio rimane ancorato a base_rads
-        current_mean = float(base_rads)
-        # Resettiamo lo stato dinamico se presente
-        if '_rad_state' in player_data:
-            del player_data['_rad_state']
-    else:
-        # --- MODALITÀ DINAMICA ---
-        # Il valore medio varia col tempo e orbita fino a coprire l'intero range 0 - 1000 RAD
-        if '_rad_state' not in player_data:
-            player_data['_rad_state'] = {
-                'current_mean': float(base_rads),
-                'target_mean': random.uniform(0.0, 1000.0),
-                'last_ticks': current_ticks,
-                'last_target_change': current_ticks
-            }
-
-        st = player_data['_rad_state']
-        dt = (current_ticks - st['last_ticks']) / 1000.0
-        st['last_ticks'] = current_ticks
-
-        # Selezione periodica di un nuovo target tra 0 e 1000
-        if current_ticks - st['last_target_change'] > TARGET_CHANGE_INTERVAL_MS:
-            st['target_mean'] = random.uniform(0.0, 1000.0)
-            st['last_target_change'] = current_ticks
-
-        # Spostamento graduale verso il nuovo target (max 15 RAD/sec)
-        diff = st['target_mean'] - st['current_mean']
-        if abs(diff) > 0.01:
-            max_step = MAX_RAD_CHANGE_PER_SEC * dt
-            step = max(-max_step, min(max_step, diff))
-            st['current_mean'] += step
-
-        current_mean = st['current_mean']
-
-    # =========================================================
-    # --- MICRO-JITTER E VALORE FINALE VISUALIZZATO ---
-    # =========================================================
-    jitter_seed = current_ticks // JITTER_INTERVAL_MS
-    jitter_rng = random.Random(jitter_seed)
-    micro_jitter = jitter_rng.uniform(-JITTER_AMPLITUDE, JITTER_AMPLITUDE)
-
-    display_rads = int(round(current_mean + micro_jitter))
-    display_rads = max(0, min(1000, display_rads))
-
-    # =========================================================
-    # --- RENDERING UI ---
-    # =========================================================
-
-    # 1. RADAWAY / RAD-X
-    quick_rad_items = player_data.get('quick_rad_items', ["(1) RadAway A)", "(3) Rad-X X)"])
-    item_y = 45
-    for item_str in quick_rad_items:
-        item_txt = font.render(item_str, True, COLOR_NV)
-        item_rect = item_txt.get_rect(right=screen_w - 15, top=item_y)
-        screen.blit(item_txt, item_rect)
-        item_y += 25
-
-    # Coordinate di riferimento
-    center_x = 115
-    right_x = screen_w - 10
-    eff_top_y = 120
-    eff_bottom_y = 170
-
-    # 2. RIQUADRO SUPERIORE "EFF" (basato sul valore medio visualizzato)
-    if current_mean >= 800: rad_eff_str = "-3 END, -2 AGL, -2 STR"
-    elif current_mean >= 600: rad_eff_str = "-2 END, -2 AGL"
-    elif current_mean >= 400: rad_eff_str = "-2 END, -1 AGL"
-    elif current_mean >= 200: rad_eff_str = "-1 END"
-    else: rad_eff_str = "NONE"
-
-    pygame.draw.line(screen, COLOR_NV, (center_x, eff_top_y), (right_x, eff_top_y), 1)
-    pygame.draw.line(screen, COLOR_NV, (right_x, eff_top_y), (right_x, eff_bottom_y - 17), 1)
-
-    eff_label = font_large.render("EFF", True, COLOR_NV)
-    eff_val = font_large.render(rad_eff_str, True, COLOR_NV)
-    screen.blit(eff_label, (center_x, eff_top_y + 2))
-    screen.blit(eff_val, eff_val.get_rect(right=right_x - 15, top=eff_top_y + 2))
-
-    # 3. LINEA DI SEPARAZIONE ORIZZONTALE
-    pygame.draw.line(screen, COLOR_NV, (0, eff_bottom_y), (center_x - 5, eff_bottom_y), 1)
-
-    # 4. SEZIONE INFERIORE
-    bot_y = eff_bottom_y + 2
-    pygame.draw.line(screen, COLOR_NV, (center_x - 5, eff_bottom_y), (center_x - 5, eff_bottom_y + 20), 1)
-
-    # RAD RESIST
-    rr_label = font.render("RAD RESIST", True, COLOR_NV)
-    rr_val = font.render(f"{rad_resist}%", True, COLOR_NV)
-    screen.blit(rr_label, (10, bot_y))
-    screen.blit(rr_val, rr_val.get_rect(right=center_x - 10, top=bot_y))
-
-    # RADS
-    rads_label = font.render("RADS", True, COLOR_NV)
-    rads_x = center_x 
-    screen.blit(rads_label, (rads_x, bot_y))
-
-    # =========================================================
-    # --- SCALA GRADUATA & INDICATORE ---
-    # =========================================================
-    meter_x1 = rads_x + rads_label.get_width() + 10
-    meter_x2 = right_x - 3
-    meter_y = eff_bottom_y
-    meter_w = max(10, meter_x2 - meter_x1)
-
-    # Linee di fondo
-    pygame.draw.line(screen, COLOR_NV, (center_x, meter_y), (right_x, meter_y), 1)
-    pygame.draw.line(screen, COLOR_NV, (right_x, eff_bottom_y), (right_x, eff_bottom_y + 20), 1)
-
-    # NUMERI 500 E 1000
-    lbl_500 = font.render("500", True, COLOR_NV)
-    lbl_1000 = font.render("1000", True, COLOR_NV)
-    screen.blit(lbl_500, lbl_500.get_rect(center=(meter_x1 + meter_w // 2, meter_y - 7)))
-    screen.blit(lbl_1000, lbl_1000.get_rect(right=meter_x2, bottom=meter_y - 2))
-
-    # TRIANGOLI ESTREMI (0 e 1000)
-    tri_0 = [(meter_x1 - 5, meter_y), (meter_x1, meter_y), (meter_x1, meter_y + 6)]
-    pygame.draw.polygon(screen, COLOR_NV, tri_0)
-
-    tri_1000 = [(right_x, meter_y), (meter_x2 - 2, meter_y), (meter_x2 - 2, meter_y + 6)]
-    pygame.draw.polygon(screen, COLOR_NV, tri_1000)
-
-    # TACCHE LUNGHE
-    for val in [200, 400, 600, 800]:
-        tx = meter_x1 + int((val / 1000.0) * meter_w)
-        pygame.draw.line(screen, COLOR_NV, (tx, meter_y), (tx, meter_y + 7), 1)
-
-    # TACCHE CORTE
-    for val in [50, 150, 250, 350, 450, 550, 650, 750, 850, 950]:
-        tx = meter_x1 + int((val / 1000.0) * meter_w)
-        pygame.draw.line(screen, COLOR_NV, (tx, meter_y), (tx, meter_y + 4), 1)
-
-    # POSIZIONAMENTO INDICATORE
-    RIGHT_ALIGN_OFFSET = 2  
-    effective_x2 = meter_x2 - RIGHT_ALIGN_OFFSET
-    effective_w = effective_x2 - meter_x1
-
-    # Calcolo posizione X esatta
-    indicator_x = meter_x1 + int((display_rads / 1000.0) * effective_w)
-    indicator_x = max(meter_x1, min(effective_x2, indicator_x))
-
-    # Testo del valore
-    ind_txt = font.render(f"{display_rads}", True, COLOR_NV)
-    screen.blit(ind_txt, ind_txt.get_rect(right=indicator_x - 5, top=meter_y + 15))
-
-    # Freccia
-    arrow_top_y = meter_y + 9
-    arrow_bot_y = meter_y + 22
-    head_pts = [
-        (indicator_x, arrow_top_y), 
-        (indicator_x - 4, arrow_top_y + 5), 
-        (indicator_x + 4, arrow_top_y + 5)
-    ]
-    pygame.draw.polygon(screen, COLOR_NV, head_pts)
-    pygame.draw.line(screen, COLOR_NV, (indicator_x, arrow_top_y), (indicator_x, arrow_bot_y + 7), 1)
-    # Freccia
-    arrow_top_y = meter_y + 9
-    arrow_bot_y = meter_y + 22
-    head_pts = [
-        (indicator_x, arrow_top_y), 
-        (indicator_x - 4, arrow_top_y + 5), 
-        (indicator_x + 4, arrow_top_y + 5)
-    ]
-    pygame.draw.polygon(screen, COLOR_NV, head_pts)
-    pygame.draw.line(screen, COLOR_NV, (indicator_x, arrow_top_y), (indicator_x, arrow_bot_y + 7), 1)
-
-def draw_eff_screen(screen, player_data, COLOR_NV, font, font_large, screen_w, screen_h):
-    """Renderizza il sotto-tab EFF senza la linea di chiusura finale."""
-    default_effects = [
-        ("Boxing Times", "Unarmed +20 (53s)"),
-        ("Buffout", "HP +60 (233s), END +3 (233s)"),
-        ("Hoarder Penalty", "STR -1, PER -1, LCK -1, INT -1, END -1, CHR -1, AGL -1"),
-        ("Legion Praetorian Armor", "Unarmed +10, Melee Weap. +5, AGL +1"),
-        ("Merchant Outfit", "Barter +5"),
-        ("Sunset Sarsaparilla", "HP +2 (25s)"),
-        ("Weapon Binding Ritual", "Unarm. Dam. +10 (233s), HP -2 (1s)")
-    ]
-    effects = player_data.get('effects', default_effects)
-
-    if not effects:
-        empty_txt = font_large.render("NO ACTIVE EFFECTS", True, COLOR_NV)
-        screen.blit(empty_txt, empty_txt.get_rect(center=(screen_w // 2 + 20, screen_h // 2)))
-        return
-
-    start_x = 42
-    max_w = screen_w - start_x - 10
-    curr_y = 37
-    name_col_w = 120
-
-    # LINEA DI SEPARAZIONE IN CIMA
-    pygame.draw.line(screen, COLOR_NV, (start_x, curr_y), (start_x + max_w, curr_y), 1)
-    curr_y += 4
-
-    num_effects = len(effects)
-    for idx, (name, desc) in enumerate(effects):
-        name_txt = font.render(name, True, COLOR_NV)
-        screen.blit(name_txt, (start_x, curr_y))
-
-        desc_x = start_x + name_col_w
-        desc_max_w = max_w - name_col_w
-        
-        words = desc.split(' ')
-        lines = []
-        current_line = ""
-        for word in words:
-            test_line = current_line + (" " if current_line else "") + word
-            if font.size(test_line)[0] <= desc_max_w:
-                current_line = test_line
-            else:
-                lines.append(current_line)
-                current_line = word
-        if current_line:
-            lines.append(current_line)
-
-        line_y = curr_y
-        for line in lines:
-            l_surface = font.render(line, True, COLOR_NV)
-            screen.blit(l_surface, (desc_x, line_y))
-            line_y += 14
-
-        item_height = max(18, (line_y - curr_y) + 2)
-        curr_y += item_height
-
-        # Disegna la linea divisoria SOLO SE NON è l'ultimo elemento
-        if idx < num_effects - 1:
-            pygame.draw.line(screen, COLOR_NV, (start_x, curr_y), (start_x + max_w, curr_y), 1)
-            curr_y += 3

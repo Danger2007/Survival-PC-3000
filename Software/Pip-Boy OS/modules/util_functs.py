@@ -71,8 +71,41 @@ class Utils:
         except FileNotFoundError:
             return {}
         
+    @staticmethod
+    def get_date():
+        now = datetime.datetime.now()
         
-        
+        # Prova ad importare user_config per leggere i valori salvati dall'utente
+        try:
+            import user_config
+        except ImportError:
+            user_config = None
+
+        # 1. Legge DATE_MODE (da user_config se c'è, altrimenti settings)
+        date_mode = getattr(user_config, 'DATE_MODE', None) if user_config else None
+        if date_mode is None:
+            date_mode = getattr(settings, 'DATE_MODE', 'Game')
+
+        # 2. Legge UI_STYLE
+        ui_style = getattr(user_config, 'UI_STYLE', None) if user_config else None
+        if ui_style is None:
+            ui_style = getattr(settings, 'UI_STYLE', '')
+        ui_style = str(ui_style).lower()
+
+        current_date = f"{now.day}.{now.month}"
+
+        # 3. Determina l'anno in base a DATE_MODE
+        if str(date_mode).lower() == 'real':
+            current_year = now.strftime("%Y")
+        else:
+            # Modalità 'Game'
+            if 'nv' in ui_style or 'vegas' in ui_style:
+                current_year = "2281"
+            else:
+                current_year = "2287"
+
+        return f"{current_date}.{current_year}"
+    
     @staticmethod
     def load_svgs(folder: str, scale: float, tint=settings.PIP_BOY_LIGHT, load_transforms=False):
         """
@@ -245,16 +278,6 @@ class Utils:
         Linear interpolation between two values.
         """
         return start + (end - start) * ((value - start_range) / (end_range - start_range))
-    
-    
-    @staticmethod
-    def get_date():
-        now = datetime.datetime.now()
-        current_date = f"{now.day}.{now.month}"
-        current_year = str(int(now.strftime("%Y")) + settings.YEARS_ADDED)
-        date = f"{current_date}.{current_year}"
-        return date
-
 
     @staticmethod
     def get_time():

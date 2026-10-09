@@ -2,6 +2,10 @@ import datetime
 import os
 import pygame
 import settings
+try:
+    import user_config
+except ImportError:
+    user_config = None
 from threading import Thread
 from typing import Callable, Dict, Optional
 
@@ -69,14 +73,35 @@ class ThreadHandler:
 
 class Tab:
     def __init__(self, screen):
-            self.footer_font = pygame.font.Font(settings.ROBOTO_CONDENSED_BOLD_PATH, 12)
-            self.screen = screen
+        self.footer_font = pygame.font.Font(settings.ROBOTO_CONDENSED_BOLD_PATH, 12)
+        self.screen = screen
+        
+        now = datetime.datetime.now()
+        self.current_date = now.strftime("%d.%m.")
+        
+        # 1. Recupera DATE_MODE da user_config (se presente), altrimenti da settings
+        date_mode = getattr(user_config, 'DATE_MODE', None) if user_config else None
+        if date_mode is None:
+            date_mode = getattr(settings, 'DATE_MODE', 'Game')
             
-            now = datetime.datetime.now()
-            self.current_date = now.strftime("%d.%m.")
-            self.current_year = str(int(now.strftime("%Y")) + 263)
+        # 2. Recupera UI_STYLE nello stesso modo per sicurezza
+        ui_style = getattr(user_config, 'UI_STYLE', None) if user_config else None
+        if ui_style is None:
+            ui_style = getattr(settings, 'UI_STYLE', '')
+        ui_style = str(ui_style).lower()
+
+        # 3. Imposta l'anno in base al valore effettivamente sovrascritto
+        if date_mode == 'Real':
+            self.current_year = now.strftime("%Y")
+        elif date_mode == 'Game':
+            if ui_style == 'fallout_nv':
+                self.current_year = "2281"
+            else:
+                self.current_year = "2287"
+        else:
+            self.current_year = now.strftime("%Y")
             
-            self.tab_footers = {}
+        self.tab_footers = {}
 
     def init_footer(self, object, margins=None, text_surface=None):
         key = object

@@ -32,7 +32,20 @@ CYCLE_OPTIONS = {
     'UI_STYLE': ['Fallout_4', 'Fallout_NV'],
     'FAKE_LOCATION': ['Commonwealth', 'Mojave'],
     'DATE_MODE': ['Game', 'Real'],
-    'RADIATION_FLUCTUATION': ['Static', 'Dynamic']
+    'RADIATION_FLUCTUATION': ['Fixed', 'Dynamic', 'None']
+}
+
+# Definizione Limiti Min/Max per i valori interi
+INT_LIMITS = {
+    'RADIATION_VALUE': (0, 1000),
+    'HP_MAX': (1, 999),
+    'HP_CURRENT': (0, 999),
+    'AP_MAX': (1, 999),
+    'AP_CURRENT': (0, 999),
+    'LEVEL': (1, 99),
+    'FPS': (15, 144),
+    'SCREEN_WIDTH': (320, 3840),
+    'SCREEN_HEIGHT': (240, 2160)
 }
 
 class SettingsTab:
@@ -63,6 +76,14 @@ class SettingsTab:
         self.str_char_index = 0
         self.str_ascii_chars = []
         
+        # Gestione Key Repeat (Pressione prolungata dei tasti)
+        self.pressed_key = None
+        self.key_press_time = 0
+        self.last_repeat_time = 0
+        self.is_holding = False
+        self.hold_delay = 350      # ms prima che inizi l'autorepeat
+        self.hold_interval = 45    # ms tra ciascuno scatto continuo
+
         self._load_settings()
         self._init_list()
 
@@ -135,7 +156,6 @@ class SettingsTab:
             for s in self.settings
         ]
 
-        # Calcola la larghezza in pixel della voce più lunga
         max_text_w = 0
         for item_text in all_items:
             w = self.inv_font.size(item_text)[0]
@@ -147,7 +167,6 @@ class SettingsTab:
         ui_style = str(getattr(settings, 'UI_STYLE', 'Fallout_4')).lower()
         is_nv = ('nv' in ui_style or 'vegas' in ui_style)
 
-        # Margine ridotto a 25px per avvicinare l'elenco alla scrollbar (che si trova a +15px)
         left_margin = 25
         left_x = self.draw_space.left + left_margin
         right_margin = 10
@@ -182,35 +201,45 @@ class SettingsTab:
         return self.editing_mode is not None or self.show_confirm_modal
 
     def handle_input(self, event):
-        """Gestione centralizzata degli input per le impostazioni."""
         if event.type != pygame.KEYDOWN:
             return False
 
+        if not self.is_editing():
+            if event.key in [pygame.K_a, pygame.K_d, pygame.K_LEFT, pygame.K_RIGHT, pygame.K_RETURN, pygame.K_KP_ENTER]:
+                return False
+
+        self._dispatch_key(event.key)
+        return True
+    
+    def _dispatch_key(self, key):
+        """Esegue l'azione del tasto premuto."""
         if self.is_editing():
-            if event.key in [pygame.K_LEFT, pygame.K_a]:
+            if key in [pygame.K_LEFT, pygame.K_a]:
                 return self.handle_horizontal_scroll(is_left=True)
-            elif event.key in [pygame.K_RIGHT, pygame.K_d]:
+            elif key in [pygame.K_RIGHT, pygame.K_d]:
                 return self.handle_horizontal_scroll(is_left=False)
-            elif event.key in [pygame.K_UP, pygame.K_w]:
+            elif key in [pygame.K_UP, pygame.K_w]:
                 return self.handle_vertical_scroll(is_up=True)
-            elif event.key in [pygame.K_DOWN, pygame.K_s]:
+            elif key in [pygame.K_DOWN, pygame.K_s]:
                 return self.handle_vertical_scroll(is_up=False)
-            elif event.key in [pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_x]:
-                if event.key == pygame.K_x:
+            elif key in [pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_x]:
+                if key == pygame.K_x:
                     return self.handle_x_press()
                 else:
                     return self.select_item()
             return True
 
-        if event.key in [pygame.K_UP, pygame.K_w]:
+        if key in [pygame.K_UP, pygame.K_w]:
             return self.handle_vertical_scroll(is_up=True)
-        elif event.key in [pygame.K_DOWN, pygame.K_s]:
+        elif key in [pygame.K_DOWN, pygame.K_s]:
             return self.handle_vertical_scroll(is_up=False)
-        elif event.key == pygame.K_x:
+        elif key in [pygame.K_RETURN, pygame.K_KP_ENTER]:
+            return self.select_item()
+        elif key == pygame.K_x:
             return self.handle_x_press()
 
         return False
-
+    
     def _activate_selected_item(self):
         if not self.settings:
             return True
@@ -331,24 +360,45 @@ class SettingsTab:
 
         if self.editing_mode == 'INT':
             var_name = self.editing_var['var_name']
-            if any(k in var_name for k in ['WIDTH', 'HEIGHT', 'RADIATION']):
-                step = 10
-            else:
-                step = 1
+            step = 10 if any(k in var_name for k in ['WIDTH', 'HEIGHT', 'RADIATION']) else 1
+            min_val, max_val = INT_LIMITS.get(var_name, (0, 9999))
 
-            self.editing_value += step if is_up else -step
+            new_val = self.editing_value + (step if is_up else -step)
+
+            # Wrap-around degli estremi (se va sopra il max torna al min, e viceversa)
+            if new_val > max_val:
+                new_val = min_val
+            elif new_val < min_val:
+                new_val = max_val
+
+            self.editing_value = new_val
             return True
 
         if self.editing_mode == 'RGB':
             delta = 5 if is_up else -5
             curr = self.editing_value[self.rgb_index]
-            self.editing_value[self.rgb_index] = max(0, min(255, curr + delta))
+            new_curr = curr + delta
+
+            # Wrap-around da 0 a 255 per ciascun canale RGB
+            if new_curr > 255:
+                new_curr = 0
+            elif new_curr < 0:
+                new_curr = 255
+
+            self.editing_value[self.rgb_index] = new_curr
             return True
 
         if self.editing_mode == 'STRING':
             curr_code = self.str_ascii_chars[self.str_char_index]
-            curr_code = (curr_code + 1) if is_up else (curr_code - 1)
-            self.str_ascii_chars[self.str_char_index] = max(32, min(126, curr_code))
+            new_code = (curr_code + 1) if is_up else (curr_code - 1)
+
+            # Wrap-around caratteri ASCII stampabili (32 - 126)
+            if new_code > 126:
+                new_code = 32
+            elif new_code < 32:
+                new_code = 126
+
+            self.str_ascii_chars[self.str_char_index] = new_code
             return True
 
         if is_up:
@@ -368,7 +418,7 @@ class SettingsTab:
         self.handle_vertical_scroll(is_up=direction)
 
     def _check_restart_required(self, var_name):
-        if var_name in ['UI_STYLE', 'FAKE_LOCATION', 'REAL_MAP']:
+        if var_name in ['UI_STYLE', 'FAKE_LOCATION', 'REAL_MAP', 'DATE_MODE']:
             self.needs_restart = True
 
     def _apply_and_save(self):

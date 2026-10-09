@@ -31,7 +31,7 @@ if UI_STYLE == "Fallout_NV":
     }
 else:
     SUBTABS = {
-        'STAT': ['STATUS', 'S.P.E.C.I.A.L.', 'PERKS'],
+        'STAT': ['STATUS', 'S.P.E.C.I.A.L.', 'PERKS', 'RAD'],
         "INV": ("WEAPONS", "APPAREL", "AID", "MISC", "JUNK", "MODS", "AMMO"),
         "DATA": ("QUESTS", "WORKSHOPS", "STATS", "NOTES", "SETTINGS")
     }
@@ -120,7 +120,7 @@ HP_MAX = 120
 HP_CURRENT = 100
 AP_MAX = 90
 AP_CURRENT = 90
-RADIATION_FLUCTUATION = 'Static'
+RADIATION_FLUCTUATION = 'None'
 RADIATION_CURRENT = 50 # percentage of hp
 RADIATION_VALUE = RADIATION_CURRENT * 10
 LEVEL = 28

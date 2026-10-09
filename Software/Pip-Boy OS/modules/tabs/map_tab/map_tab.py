@@ -132,7 +132,14 @@ class MapTab:
     def update_footer_time(self):
         while True:
             self.time = Utils.get_time()
+            self.date = Utils.get_date()
+            self.tab_instance.init_footer(
+                self, 
+                (settings.SCREEN_WIDTH // 4, settings.SCREEN_WIDTH // 4), 
+                self._init_footer_text()
+            )
             self._blit_footer_time()
+            
             now = datetime.now()
             wait_time = 60 - now.second
             pygame.time.wait(wait_time * 1000)

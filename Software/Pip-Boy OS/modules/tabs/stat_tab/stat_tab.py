@@ -45,7 +45,8 @@ class StatTab:
             sub_tab_map = {
                 0: self.status_tab,
                 1: self.special_tab,
-                2: self.perks_tab
+                2: self.perks_tab,
+                3: self.status_tab.rad_subtab
             }
         
         self.sub_tab_thread_handler = ThreadHandler(sub_tab_map, self.current_sub_tab_index)
@@ -64,6 +65,12 @@ class StatTab:
                 case 1: return self.special_tab
                 case 3: return self.perks_tab
                 case 4: return self.general_tab
+        else:
+            match self.current_sub_tab_index:
+                case 0: return self.status_tab
+                case 1: return self.special_tab
+                case 2: return self.perks_tab
+                case 3: return self.status_tab.rad_subtab
         return self
 
     def init_footer_text(self): 
@@ -135,8 +142,7 @@ class StatTab:
                 case 0: self.status_tab.scroll(direction)
                 case 1: self.special_tab.scroll_special(direction)
                 case 2: self.perks_tab.scroll_perks(direction)
-                case 3: self._scroll_skills(direction)
-                case _: pass
+                case 3: pass # RAD Does not have scrolling functionalities
 
     def select_item(self):
         ui_style = str(getattr(settings, 'UI_STYLE', '')).lower()
@@ -152,9 +158,6 @@ class StatTab:
     def render(self):
         ui_style = str(getattr(settings, 'UI_STYLE', '')).lower()
         
-        if ui_style != 'fallout_nv':
-            self.tab_instance.render_footer(self)
-
         if ui_style == 'fallout_nv':
             match self.current_sub_tab_index:
                 case 0: self.status_tab.render()
@@ -170,15 +173,12 @@ class StatTab:
                 case 3: self.perks_tab.render()
                 case 4: self.general_tab.render()
         else:
+            self.tab_instance.render_footer(self)
             match self.current_sub_tab_index:
                 case 0: self.status_tab.render()
                 case 1: self.special_tab.render()
                 case 2: self.perks_tab.render()
                 case 3:
-                    skills_data = getattr(settings, 'DEFAULT_SKILLS', [])
-                    selected_idx = getattr(self, 'selected_skill_index', 0)
-                    draw_skills_tab(
-                        self.screen, skills_data, selected_idx,
-                        settings.PIP_BOY_LIGHT, self.footer_font,
-                        settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT
-                    )
+                    # Renderizza direttamente il RadSubtab per Fallout 4
+                    p_data = getattr(self.tab_instance, 'player_data', {})
+                    self.status_tab.rad_subtab.render(p_data, ui_style)
