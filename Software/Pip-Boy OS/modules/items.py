@@ -106,7 +106,7 @@ class ItemLoader:
                     ammo_type=data.get('ammo_type', ''),
                     damage_types=self._parse_icon_configs(data.get('damage_types', '')),
                 )
-                # Legge le mod dal file ini e le salva come lista nell'oggetto
+                # Reads the 'mods' field and splits it into a list, handling empty cases
                 mods_raw = data.get('mods', '')
                 weapon.mods = [m.strip() for m in mods_raw.split(',')] if mods_raw else []
                 

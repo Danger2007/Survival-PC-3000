@@ -131,13 +131,11 @@ class NotesTab:
         self._init_layout()
 
     def _get_ui_style(self):
-        """Rileva lo stile dell'interfaccia da settings (default: 'Fallout_NV')."""
         return getattr(settings, "UI_STYLE", "Fallout_NV")
 
     def _get_sorted_visible_notes(self):
         """
-        Restituisce le note visibili ordinate per lo stile NV (attive prima),
-        o semplicemente le note visibili per lo stile Fallout 4.
+        Prints a sorted list of visible notes, with active notes appearing first if the UI style is 'Fallout_NV'.
         """
         visible = [note for note in self.notes if note.get("visible", True)]
         if self._get_ui_style() == "Fallout_NV":
@@ -183,11 +181,11 @@ class NotesTab:
         return False
 
     def toggle_focus(self):
-        """Alterna il focus tra la lista delle note e il testo del dettaglio a destra."""
+        """Alternates between scrolling on the note list and the note description."""
         self.focus_on_desc = not self.focus_on_desc
 
     def select_item(self):
-        # Le note non si equipaggiano/attivano manualmente dal player
+        # Notes Tab doesn't have a specific action for selecting an item, but this method can be expanded in the future if needed.
         pass
 
     def scroll(self, direction: bool):
@@ -208,7 +206,7 @@ class NotesTab:
             self.selected_index = max(0, min(len(visible_notes) - 1, self.selected_index + step))
 
     def _wrap_text(self, text, font, max_width):
-        """A capo automatico del testo che rispetta anche i ritorni a capo singoli e doppi (\\n)."""
+        """Automatically wraps text to fit within a specified width, returning a list of lines."""
         lines = []
         paragraphs = text.split('\n')
         
@@ -233,13 +231,13 @@ class NotesTab:
         return lines
 
     def _draw_nv_scrollbar(self, x, top_y, bottom_y, total_items, visible_items, current_offset, color):
-        """Disegna la scrollbar verticale (frecce e barra mobile, senza linea statica di sfondo)."""
-        arrow_w = 2  # Larghezza totale freccia = 4px
-        arrow_h = 4  # Altezza freccia
+        """Draws a simple vertical scrollbar with arrows at the top and bottom."""
+        arrow_w = 2
+        arrow_h = 4
         notch = 1
-        line_w = 1   # Spessore barra
+        line_w = 1
 
-        # Freccia Su
+        # Upper arrow
         up_arrow_pts = [
             (x, top_y),
             (x + arrow_w, top_y + arrow_h),
@@ -248,7 +246,7 @@ class NotesTab:
         ]
         pygame.draw.polygon(self.screen, color, up_arrow_pts)
 
-        # Freccia Giù
+        # Lower arrow
         down_arrow_pts = [
             (x, bottom_y),
             (x + arrow_w, bottom_y - arrow_h),
@@ -311,7 +309,7 @@ class NotesTab:
         for i, note in enumerate(visible_notes):
             is_active = note.get("active", True)
 
-            # Disegna la linea divisoria prima della prima nota inattiva
+            # Draw a separator line between active and inactive notes
             if i > 0:
                 prev_active = visible_notes[i - 1].get("active", True)
                 if prev_active and not is_active:
@@ -348,7 +346,7 @@ class NotesTab:
             y_cursor += item_h + 2
             rendered_count += 1
 
-        # Scrollbar a SINISTRA dell'elenco delle note
+        # Scrollbar to the left of the note list
         self._draw_nv_scrollbar(
             x=self.draw_space.left + 4,
             top_y=self.list_rect.top,
@@ -363,14 +361,14 @@ class NotesTab:
         y_top = self.draw_space.top + 2
         right_x = self.draw_space.right - 10
 
-        # Intestazioni in alto a destra
+        # Text headers above the note text
         act1 = self.font_main.render("Show Active Quest Notes X)", True, color_light)
         self.screen.blit(act1, (right_x - act1.get_width(), y_top + 1))
 
         act2 = self.font_main.render("Challenges Y)", True, color_light)
         self.screen.blit(act2, (right_x - act2.get_width(), y_top + 15))
 
-        # Inizio area dettagli/istruzioni
+        # Start rendering the note text below the headers
         y_start = y_top + 48
 
         text_color = color_light if note.get("active", True) else color_middle
@@ -395,7 +393,7 @@ class NotesTab:
             desc_box = pygame.Rect(self.details_rect.left - 4, y_start - 4, self.details_rect.width - 10, box_h)
             pygame.draw.rect(self.screen, color_light, desc_box, 1)
 
-        # Scrollbar a DESTRA del riquadro dei dettagli
+        # Scrollbar to the right of the details box
         self._draw_nv_scrollbar(
             x=self.details_rect.right - 8,
             top_y=y_start - 4,
@@ -427,7 +425,6 @@ class NotesTab:
             item_rect = pygame.Rect(self.list_rect.left + text_offset_x - 3, y_cursor, self.list_rect.width - text_offset_x + 3, item_h)
 
             if i == self.selected_index:
-                # 1. Disegno diretto e opaco del rettangolo (nessuna Surface SRCALPHA/trasparenza)
                 pygame.draw.rect(self.screen, color_light, item_rect)
                 text_color = bg_dark if not self.focus_on_desc else color_light
             else:
@@ -442,7 +439,7 @@ class NotesTab:
             y_cursor += item_h + 1
             rendered_count += 1
 
-        # Scrollbar a SINISTRA dell'elenco delle note (stile Fallout 4)
+        # Scrollbar to the left of the note list (Fallout 4 style)
         self._draw_nv_scrollbar(
             x=self.draw_space.left + 4,
             top_y=self.list_rect.top,
@@ -469,7 +466,7 @@ class NotesTab:
                 self.screen.blit(surf, (self.details_rect.left, current_y))
             current_y += line_height
 
-        # Scrollbar a DESTRA del riquadro dei dettagli (stile Fallout 4)
+        # Scrollbar to the right of the details box (Fallout 4 style)
         if len(lines) > max_visible:
             self._draw_nv_scrollbar(
                 x=self.details_rect.right - 8,

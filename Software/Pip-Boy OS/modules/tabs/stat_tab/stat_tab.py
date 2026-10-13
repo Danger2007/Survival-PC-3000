@@ -179,6 +179,6 @@ class StatTab:
                 case 1: self.special_tab.render()
                 case 2: self.perks_tab.render()
                 case 3:
-                    # Renderizza direttamente il RadSubtab per Fallout 4
+                    # Directly render the RAD subtab without threading
                     p_data = getattr(self.tab_instance, 'player_data', {})
                     self.status_tab.rad_subtab.render(p_data, ui_style)

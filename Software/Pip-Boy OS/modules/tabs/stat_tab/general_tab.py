@@ -176,20 +176,20 @@ class GeneralTab:
         if event.type != pygame.KEYDOWN:
             return False
 
-        # Se siamo in SETTINGS ed è attivo un popup/editor, gestiscilo in settings_tab
+        # If we are in SETTINGS and currently editing, delegate input handling to settings_tab
         if self.mode == "SETTINGS" and self.settings_tab.is_editing():
             return self.settings_tab.handle_input(event)
 
-        # Se la finestra popup è CHIUSA, Invio (ENTER) o R cambiano scheda (GENERAL -> REPUTATION -> SETTINGS -> GENERAL)
+        # If we are in GENERAL or REPUTATION, handle input for scrolling and toggling modes
         if event.key in [pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_r]:
             self.toggle_mode()
             return True
 
-        # Se siamo in SETTINGS, inoltra frecce o tasto X a settings_tab
+        # If we are in SETTINGS and not editing, handle input in settings_tab
         if self.mode == "SETTINGS":
             return self.settings_tab.handle_input(event)
 
-        # Gestione scorimento frecce per GENERAL e REPUTATION
+        # Arrow keys Management for GENERAL and REPUTATION modes
         if event.key in [pygame.K_UP, pygame.K_w]:
             self.scroll_general(direction=True)
             return True

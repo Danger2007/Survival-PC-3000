@@ -37,15 +37,15 @@ class MapTab:
         else:
             self.world_map_subtab = WorldMap(self.screen, self.draw_space)
 
-        # --- Impostazioni Zoom Local / World Map ---
+        # --- Zoom/World Map Settings ---
         initial_zoom = 1.0
         if hasattr(self.world_map_subtab, 'zoom_level'):
             initial_zoom = self.world_map_subtab.zoom_level
         elif hasattr(self.world_map_subtab, 'map_zoom'):
             initial_zoom = self.world_map_subtab.map_zoom
 
-        self.world_zoom = initial_zoom  # Zoom per World Map (invariato)
-        self.local_zoom = 2.2           # Zoom per Local Map (più zoommata)
+        self.world_zoom = initial_zoom  # Zoom for World Map
+        self.local_zoom = 2.2           # Zoom for Local Map (more zoomed in, technically)
         self.is_local_map = None
                 
         self.tab_instance.init_footer(
@@ -72,7 +72,7 @@ class MapTab:
         return self.local_zoom if self.is_local_map else self.world_zoom
 
     def _apply_zoom(self, target_zoom: float):
-        """Applica lo zoom assoluto alla mappa senza eseguire zoom relativi"""
+        """Applies the target zoom level to the current sub-tab, if applicable."""
         if hasattr(self.world_map_subtab, 'set_zoom') and callable(getattr(self.world_map_subtab, 'set_zoom')):
             self.world_map_subtab.set_zoom(target_zoom)
         elif hasattr(self.world_map_subtab, 'zoom_level'):

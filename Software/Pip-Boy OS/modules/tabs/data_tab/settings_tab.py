@@ -35,7 +35,7 @@ CYCLE_OPTIONS = {
     'RADIATION_FLUCTUATION': ['Fixed', 'Dynamic', 'None']
 }
 
-# Definizione Limiti Min/Max per i valori interi
+# Defines the min/max values for integer settings to ensure they stay within valid ranges.
 INT_LIMITS = {
     'RADIATION_VALUE': (0, 1000),
     'HP_MAX': (1, 999),
@@ -66,23 +66,23 @@ class SettingsTab:
         self.show_confirm_modal = False
         self.modal_selection = 0  # 0: YES, 1: NO
         
-        # Stato Editor Popup
+        # Editor pop-up state
         self.editing_mode = None  # None, 'INT', 'RGB', 'STRING'
         self.editing_var = None
         self.editing_value = None
         
-        # Dati specifici per l'editor
+        # Specific data for RGB and STRING editing
         self.rgb_index = 0  # 0: R, 1: G, 2: B
         self.str_char_index = 0
         self.str_ascii_chars = []
         
-        # Gestione Key Repeat (Pressione prolungata dei tasti)
+        # Management of key presses for repeated inputs
         self.pressed_key = None
         self.key_press_time = 0
         self.last_repeat_time = 0
         self.is_holding = False
-        self.hold_delay = 350      # ms prima che inizi l'autorepeat
-        self.hold_interval = 45    # ms tra ciascuno scatto continuo
+        self.hold_delay = 350   #ms before first repeat
+        self.hold_interval = 45 #ms between repeats
 
         self._load_settings()
         self._init_list()
@@ -197,7 +197,7 @@ class SettingsTab:
         self.settings_list.selected_index = max(0, min(rel_index, len(visible_items) - 1))
 
     def is_editing(self):
-        """Restituisce True se un popup è aperto."""
+        """Returns True if a popup is open."""
         return self.editing_mode is not None or self.show_confirm_modal
 
     def handle_input(self, event):
@@ -212,7 +212,7 @@ class SettingsTab:
         return True
     
     def _dispatch_key(self, key):
-        """Esegue l'azione del tasto premuto."""
+        """Execute the appropriate action based on the current editing state and the key pressed. (needed for key repeat handling and FNV style)"""
         if self.is_editing():
             if key in [pygame.K_LEFT, pygame.K_a]:
                 return self.handle_horizontal_scroll(is_left=True)
@@ -365,7 +365,7 @@ class SettingsTab:
 
             new_val = self.editing_value + (step if is_up else -step)
 
-            # Wrap-around degli estremi (se va sopra il max torna al min, e viceversa)
+            # Wrap-around of the integer value within the defined limits
             if new_val > max_val:
                 new_val = min_val
             elif new_val < min_val:
@@ -379,7 +379,7 @@ class SettingsTab:
             curr = self.editing_value[self.rgb_index]
             new_curr = curr + delta
 
-            # Wrap-around da 0 a 255 per ciascun canale RGB
+            # Wrap-around for RGB values (0-255)
             if new_curr > 255:
                 new_curr = 0
             elif new_curr < 0:
@@ -392,7 +392,7 @@ class SettingsTab:
             curr_code = self.str_ascii_chars[self.str_char_index]
             new_code = (curr_code + 1) if is_up else (curr_code - 1)
 
-            # Wrap-around caratteri ASCII stampabili (32 - 126)
+            # Wrap-around ASCII printable characters (32-126)
             if new_code > 126:
                 new_code = 32
             elif new_code < 32:

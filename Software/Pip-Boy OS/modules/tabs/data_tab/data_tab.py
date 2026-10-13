@@ -47,7 +47,7 @@ class DataTab:
         
         self.sub_tab_thread_handler = ThreadHandler(sub_tab_map, self.current_sub_tab_index)
 
-        # Thread per l'aggiornamento dinamico dell'orario
+        # Thread for updating the footer time every minute
         self.footer_time_thread = Thread(target=self.update_footer_time, daemon=True)
         self.footer_time_thread.start()
 

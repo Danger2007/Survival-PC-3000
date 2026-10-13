@@ -9,12 +9,11 @@ class WorkshopsTab:
         self.screen = screen
         self.tab_instance = tab_instance
         self.draw_space = draw_space
-
-        # Font ridimensionati per matchare l'interfaccia principale del Pip-Boy
+        # Fonts
         self.font = pygame.font.Font(settings.ROBOTO_BOLD_PATH, 10)
         self.font_small = pygame.font.Font(settings.ROBOTO_BOLD_PATH, 9)
 
-        # Dati degli insediamenti (Officine)
+        # Data for workshops, including warnings and statistics
         self.workshops = [
             {"name": "Greentop Nursery", "warning": True, "stats": {"People": 3, "Food": 12, "Water": 15, "Power": 3, "Defense": 16, "Beds": 12, "Happiness": 40}},
             {"name": "Hangman's Alley", "warning": False, "stats": {"People": 6, "Food": 6, "Water": 10, "Power": 5, "Defense": 28, "Beds": 6, "Happiness": 65}},
@@ -31,7 +30,7 @@ class WorkshopsTab:
         self.selected_index = 0
         self.scroll_offset = 0
 
-        # --- RIDIMENSIONAMENTO E POSIZIONAMENTO PANNELLI CON MARGINI SIMMETRICI ---
+        # --- RESIZING AND POSITIONING PANELS WITH SYMMETRIC MARGINS ---
         self.left_panel_width = int(self.draw_space.width * 0.55)
         grid_width = int(self.draw_space.width * 0.32)
 
@@ -49,7 +48,7 @@ class WorkshopsTab:
             padding=1
         )
 
-        # Caricamento icone per il pannello destro e avviso
+        # Loading icons for the right panel and warning
         self.icons = {}
         self.warning_icon = None
         self._load_workshop_icons()
@@ -84,7 +83,7 @@ class WorkshopsTab:
 
         icon_size = (11, 11)
 
-        # Caricamento icona avviso warning.png
+        # Loading warning icon
         if icons_dir:
             warn_path = os.path.join(icons_dir, "warning.png")
             if os.path.exists(warn_path):
@@ -95,7 +94,7 @@ class WorkshopsTab:
             pygame.draw.polygon(surf, (255, 255, 255), [(5, 1), (1, 9), (9, 9)])
             self.warning_icon = surf
 
-        # Caricamento icone statistiche
+        # Loading icons for each stat, with fallback to procedural icons if not found
         for stat_name, file_candidates in icon_mapping.items():
             loaded_surf = None
             if icons_dir:
@@ -113,7 +112,7 @@ class WorkshopsTab:
                 self.icons[stat_name] = loaded_surf
 
     def _try_load_image(self, filepath, size):
-        """Caricamento e ridimensionamento immagine con Pygame."""
+        """Loading image and resizing it to the specified size."""
         try:
             img = pygame.image.load(filepath)
             return pygame.transform.smoothscale(img.convert_alpha(), size)
@@ -121,7 +120,7 @@ class WorkshopsTab:
             return None
 
     def _create_procedural_icon(self, stat_name, size):
-        """Icona geometrica di emergenza."""
+        """Fallback icons"""
         surf = pygame.Surface(size, pygame.SRCALPHA)
         white = (255, 255, 255)
 
@@ -153,7 +152,7 @@ class WorkshopsTab:
         return surf
 
     def _get_tinted_icon(self, icon_surf, color):
-        """Ricolora l'immagine mantenendo la trasparenza."""
+        """Recolors the icon surface with the pip-boy color theme."""
         if not icon_surf:
             return None
         tinted = icon_surf.copy().convert_alpha()
@@ -163,7 +162,7 @@ class WorkshopsTab:
         return tinted
 
     def _update_grid(self):
-        """Aggiorna le voci della griglia in base all'insediamento selezionato."""
+        """Update the item grid with the stats of the currently selected workshop."""
         if 0 <= self.selected_index < len(self.workshops):
             selected_ws = self.workshops[self.selected_index]
             entries = [{"label": k, "value": v} for k, v in selected_ws["stats"].items()]
@@ -171,12 +170,12 @@ class WorkshopsTab:
                 self.item_grid.update(entries)
 
     def scroll(self, direction: bool):
-        """Scroll tra gli insediamenti (True -> Su, False -> Giù)"""
+        """Scroll between workshops"""
         prev_index = self.selected_index
-        if direction:
+        if direction: # Up
             if self.selected_index > 0:
                 self.selected_index -= 1
-        else:
+        else: # Down
             if self.selected_index < len(self.workshops) - 1:
                 self.selected_index += 1
 
@@ -191,7 +190,7 @@ class WorkshopsTab:
         row_h = self.font.get_linesize() + 6
         max_visible = self.draw_space.height // row_h
 
-        # Gestione dello scroll
+        # Scroll managment
         if self.selected_index < self.scroll_offset:
             self.scroll_offset = self.selected_index
         elif self.selected_index >= self.scroll_offset + max_visible:
@@ -200,7 +199,7 @@ class WorkshopsTab:
         pip_light = getattr(settings, 'PIP_BOY_LIGHT', (0, 255, 0))
         pip_dark = getattr(settings, 'PIP_BOY_DARK', (0, 30, 0))
 
-        # --- PANNELLO SINISTRO (Lista Officine) ---
+        # --- LEFT PANEL (Workshop List) ---
         left_w = self.left_panel_width
         y = self.draw_space.top + 8
 
@@ -215,12 +214,12 @@ class WorkshopsTab:
             else:
                 text_color = pip_light
 
-            # Nome Officina (spostato di 5px verso destra con left_margin + 5)
+            # Name of the workshop
             name_surf = self.font.render(item["name"], True, text_color)
             name_rect = name_surf.get_rect(midleft=(left_margin + 10, item_rect.centery))
             self.screen.blit(name_surf, name_rect)
 
-            # Icona Avviso PNG (warning.png)
+            # Warning Icon (warning.png)
             if item.get("warning", False) and self.warning_icon:
                 warn_color = (0, 0, 0) if actual_idx == self.selected_index else pip_light
                 tinted_warn = self._get_tinted_icon(self.warning_icon, warn_color)
@@ -237,7 +236,7 @@ class WorkshopsTab:
 
             y += row_h
 
-        # --- PANNELLO DESTRO (Statistiche) ---
+        # --- RIGHT PANEL (Statistics) ---
         if 0 <= self.selected_index < len(self.workshops):
             selected_ws = self.workshops[self.selected_index]
             stats = selected_ws["stats"]
@@ -248,18 +247,17 @@ class WorkshopsTab:
 
             for row_idx, (stat_name, stat_value) in enumerate(stats.items()):
                 row_rect = pygame.Rect(self.grid_rect.left, right_y, self.grid_rect.width, stat_row_h - 2)
-
-                # Sfondo rettangolo
+                # Background rectangle for each stat row
                 pygame.draw.rect(self.screen, pip_dark, row_rect)
 
-                # Verifica avviso singola statistica
+                # Verifies if the stat has a warning condition
                 has_stat_warning = False
                 if stat_name in ("Beds", "Food", "Water") and stat_value < people_cnt:
                     has_stat_warning = True
                 elif stat_name == "Happiness" and stat_value < 50 and people_cnt > 0:
                     has_stat_warning = True
 
-                # 1. Icona PNG ricolorata
+                # 1. PNG Icon recolored
                 icon_x = row_rect.left + 4
                 label_x = icon_x
 
@@ -271,17 +269,17 @@ class WorkshopsTab:
                         self.screen.blit(tinted_icon, icon_rect)
                         label_x = icon_rect.right + 5
 
-                # 2. Etichetta Statistica
+                # 2. Statistic label
                 label_surf = self.font.render(stat_name, True, pip_light)
                 label_rect = label_surf.get_rect(midleft=(label_x, row_rect.centery))
                 self.screen.blit(label_surf, label_rect)
 
-                # 3. Valore Statistica (Allineato a destra)
+                # 3. Statistic value
                 val_surf = self.font.render(str(stat_value), True, pip_light)
                 val_rect = val_surf.get_rect(midright=(row_rect.right - 16 if has_stat_warning else row_rect.right - 4, row_rect.centery))
                 self.screen.blit(val_surf, val_rect)
 
-                # 4. Icona avviso accanto al valore nel pannello di destra
+                # 4. Warning Icon
                 if has_stat_warning and self.warning_icon:
                     tinted_warn = self._get_tinted_icon(self.warning_icon, pip_light)
                     if tinted_warn:

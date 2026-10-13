@@ -13,8 +13,8 @@ class InputManager:
         self.key_press_time = 0
         self.last_repeat_time = 0
         self.is_holding = False
-        self.hold_delay = 350      # ms di attesa prima di iniziare la ripetizione
-        self.hold_interval = 45    # ms tra ogni scatto continuo
+        self.hold_delay = 350      # ms before first repeat
+        self.hold_interval = 45    # ms between repeated inputs
 
     def handle_keyboard(self, event: pygame.event.Event):
         if event.type == pygame.KEYDOWN:
@@ -32,7 +32,7 @@ class InputManager:
             self.key_queue.put(event)
 
     def update_key_repeat(self):
-        """Genera eventi ripetuti se un tasto rimane premuto."""
+        """Generates repeated inputs for the currently pressed key if it's being held down."""
         if not self.pressed_key_event:
             return
 
@@ -70,7 +70,7 @@ class InputManager:
             sys.exit()
 
     def handle_input(self, tab_manager):
-        # Aggiorna il ciclo di ripetizione tasti ad ogni frame
+        # Updates the key repeat state and processes the input queue at every frame
         self.update_key_repeat()
 
         with self.get_key_lock:
@@ -78,13 +78,23 @@ class InputManager:
                 event = self.key_queue.get()
                 key = event.key if hasattr(event, 'key') else event
 
+                # If the screensaver is active, any key press will deactivate it and reset the activity timer
+                if getattr(tab_manager, 'screensaver_active', False):
+                    tab_manager.screensaver_active = False
+                    tab_manager.reset_activity()
+                    continue
+
+                # Update the activity timer for the tab manager if it has a reset_activity method
+                if hasattr(tab_manager, 'reset_activity'):
+                    tab_manager.reset_activity()
+
                 active_subtab = tab_manager.get_active_subtab()
 
                 target_subtab = active_subtab
                 if active_subtab and getattr(active_subtab, 'mode', None) == "SETTINGS" and hasattr(active_subtab, 'settings_tab'):
                     target_subtab = active_subtab.settings_tab
 
-                # 1. Passa l'evento alla sottoscheda target
+                # 1. Pass the event to the target subtab
                 if target_subtab and hasattr(target_subtab, 'handle_input'):
                     if target_subtab.handle_input(event):
                         continue
@@ -92,7 +102,7 @@ class InputManager:
                 if getattr(event, 'type', None) == pygame.KEYUP:
                     continue
 
-                # 2. Se in modalità editing
+                # 2. If the target subtab is in editing mode, handle specific keys for editing
                 if target_subtab and hasattr(target_subtab, 'is_editing') and target_subtab.is_editing():
                     match key:
                         case pygame.K_RETURN | pygame.K_KP_ENTER:
@@ -109,7 +119,7 @@ class InputManager:
                             pass
                     continue
 
-                # 3. Navigazione standard Pip-Boy
+                # 3. Standard Pip-Boy navigation
                 match key:
                     case pygame.K_LEFT:
                         tab_manager.switch_tab(False)

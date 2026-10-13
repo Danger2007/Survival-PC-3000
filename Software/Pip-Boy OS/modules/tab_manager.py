@@ -1,4 +1,5 @@
 import os
+import time
 import settings
 import pygame
 import random
@@ -11,6 +12,7 @@ from tabs.stat_tab.stat_tab import StatTab
 from tabs.inv_tab.inv_tab import InvTab
 from tabs.data_tab.data_tab import DataTab
 from tabs.map_tab.map_tab import MapTab
+from tabs.clock_tab.clock_tab import ClockTab
 from tab import Tab, ThreadHandler
 
 class TabManager:
@@ -18,7 +20,7 @@ class TabManager:
         self.screen = screen
         self.ui_style = str(getattr(settings, 'UI_STYLE', '')).lower()
         
-        # Inizializzazione centralizzata di player_data
+        # Centralized initialization of player data.
         self.player_data = {
             'hp': getattr(settings, 'PLAYER_HP', 280),
             'max_hp': getattr(settings, 'PLAYER_MAX_HP', 280),
@@ -40,7 +42,7 @@ class TabManager:
                 "(5) Stimpak S",
                 "(3) Doctor's Bag E"
             ],
-            'status_side_index': 0  # Index per CND (0), RAD (1), EFF (2)
+            'status_side_index': 0  # Index for CND (0), RAD (1), EFF (2)
         }
 
         if self.ui_style == 'fallout_nv':
@@ -82,6 +84,11 @@ class TabManager:
         self.data_tab = DataTab(self.screen, self.tab_base, self.draw_space)
         self.map_tab = MapTab(self.screen, self.tab_base, self.map_draw_space)
         self.radio_tab = RadioTab(self.screen, self.tab_base, self.draw_space)
+        
+        # Initialize the ClockTab for displaying the Screensaver clock when the Pip-Boy is idle.
+        self.clock_tab = ClockTab(self.screen, self.tab_base, self.draw_space)
+        self.last_activity_time = time.time()
+        self.screensaver_active = False
 
         self.current_sub_tab_index = [0] * len(self.tabs)
         self.previous_sub_tab_index = [0] * len(self.tabs)
@@ -106,6 +113,10 @@ class TabManager:
             4: self.radio_tab,
         }
         self.tab_thread_handler = ThreadHandler(tab_map, self.current_tab_index)
+
+    def reset_activity(self):
+        """Reset the inactivity timer for Screensaver"""
+        self.last_activity_time = time.time()
 
     def render_tab(self):
         ui_style = str(getattr(settings, 'UI_STYLE', '')).lower()
@@ -213,7 +224,7 @@ class TabManager:
             total_widths = []
             self.subtab_offsets[tab_name] = []
             
-            for subtab in subtabs: #Draw active and inactive surfaces for each subtab in the header of fallout 4
+            for subtab in subtabs:
                 active = self.main_tab_font.render(subtab, True, settings.PIP_BOY_LIGHT)
                 inactive = self.main_tab_font.render(subtab, True, settings.PIP_BOY_MID)
                 active_surfaces.append(active)
@@ -243,8 +254,8 @@ class TabManager:
 
     def tab_switch_glitch(self):
         for _ in range(20):
-            time = pygame.time.get_ticks()
-            jump_offset = int(20 * math.sin(time))
+            time_tick = pygame.time.get_ticks()
+            jump_offset = int(20 * math.sin(time_tick))
             self.screen.blit(self.screen, (0, -jump_offset))
             pygame.time.wait(settings.SPEED * 100)
 
@@ -503,6 +514,18 @@ class TabManager:
             )
 
     def render(self):
+        # Check timeout for screensaver activation
+        timeout = getattr(settings, 'SCREENSAVER_TIMEOUT', 60)
+        if timeout > 0 and not self.screensaver_active:
+            if time.time() - self.last_activity_time > timeout:
+                self.screensaver_active = True
+
+        # If the screensaver is active, render the clock tab
+        if self.screensaver_active:
+            self.screen.fill(settings.BACKGROUND)
+            self.clock_tab.render()
+            return
+
         ui_style = str(getattr(settings, 'UI_STYLE', '')).lower()
         if ui_style == 'fallout_nv':
             self.screen.fill(settings.BACKGROUND)
@@ -578,12 +601,9 @@ class TabManager:
         if not active_subtab:
             return
 
-        # 1. Se il subtab/scheda attiva implementa handle_x_press
         if hasattr(active_subtab, 'handle_x_press'):
             active_subtab.handle_x_press()
-        # 2. Se è GeneralTab o un wrapper con modalità SETTINGS
         elif getattr(active_subtab, 'mode', None) == "SETTINGS" and hasattr(active_subtab, 'settings_tab'):
             active_subtab.settings_tab.handle_x_press()
-        # 3. Fallback standard su toggle_focus
         elif hasattr(active_subtab, 'toggle_focus'):
             active_subtab.toggle_focus()

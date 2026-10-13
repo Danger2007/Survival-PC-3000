@@ -7,7 +7,7 @@ from util_functs import Utils
 
 
 def colorize_surface(surface, color):
-    """Applica la tinta del Pip-Boy ad un'immagine mantenendo la trasparenza."""
+    """Applies color theme to the icons."""
     if surface is None:
         return None
     tinted = surface.copy()
@@ -17,7 +17,7 @@ def colorize_surface(surface, color):
 
 
 def load_nv_special_image(special_name):
-    """Carica l'immagine statica .webp per New Vegas."""
+    """Loads the New Vegas .webp image for a given name, using caching to avoid reloading."""
     clean_name = special_name.strip()
     possible_filenames = [
         f"{clean_name.lower()}.webp",
@@ -127,7 +127,7 @@ class SpecialTab:
 
     def _init_special_text(self):
         special_discriptions = {}
-        # Calcolo della larghezza della colonna destra ridotta di 7px a destra per il wrapping
+        # Calculate the right_x and right_w for text wrapping based on the draw_space
         right_x = self.draw_space.centerx + settings.TAB_SIDE_MARGIN
         right_w = (self.draw_space.right - right_x) - settings.TAB_SIDE_MARGIN
         wrap_w = right_w - 15
@@ -188,7 +188,7 @@ class SpecialTab:
         selected_special = settings.SPECIAL[self.selected_special_index]
         stats = getattr(settings, 'DEFAULT_SPECIAL_STATS', {})
         
-        # 1. LISTA SPECIAL
+        # 1. SPECIAL LIST
         left_x = self.draw_space.left + settings.TAB_SIDE_MARGIN + 15
         top_y = self.draw_space.top + (2 * settings.LIST_TOP_MARGIN) - 15
         list_w = int(self.draw_space.width * 0.40)
@@ -217,7 +217,7 @@ class SpecialTab:
             val_x = left_x + list_w - val_surf.get_width()
             self.screen.blit(val_surf, (val_x, item_y + (line_height - val_surf.get_height()) // 2))
 
-        # 2. ICONA STATICA WEBP
+        # 2. WEBP ICON
         right_x = self.draw_space.centerx + settings.TAB_SIDE_MARGIN
         right_w = (self.draw_space.right - right_x) - settings.TAB_SIDE_MARGIN
         target_h = int(self.draw_space.height * 0.52)
@@ -235,12 +235,12 @@ class SpecialTab:
             center_y = top_y + (target_h - new_size[1]) // 2
             self.screen.blit(colored_img, (center_x, center_y))
 
-        # 3. LINEA DIVISORIA CON ANGOLO A DESTRA
+        # 3. DIVIDER LINE WITH ANGLE
         divider_y = top_y + target_h + 4
         pygame.draw.line(self.screen, settings.PIP_BOY_LIGHT, (right_x, divider_y), (right_x + right_w - 10, divider_y), 1)
         pygame.draw.line(self.screen, settings.PIP_BOY_LIGHT, (right_x + right_w - 10, divider_y), (right_x + right_w - 10, divider_y + 7), 1)
 
-        # 4. TESTO DESCRIZIONE (Allineato a sinistra con right_x, a capo 7px prima del bordo destro)
+        # 4. DESCRIPTION TEXT
         self._render_special_text(selected_special, pos_x=right_x, pos_y=divider_y + 8)
 
     def render(self):

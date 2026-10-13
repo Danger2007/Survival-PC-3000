@@ -101,9 +101,9 @@ def draw_vaultboy_and_cnd(screen, player_data, center_x, center_y, color):
     max_hp = player_data.get('max_hp', 280)
     hp_pct = (hp / max_hp) if max_hp > 0 else 1.0
 
-    # ----------------------------------------------------
-    # 1. DISAGNO DEL VAULT BOY (Assemblato)
-    # ----------------------------------------------------
+    # --------------------
+    # 1. VAULT BOY RENDER
+    # --------------------
     if assets:
         if hp_pct >= 0.8: face_idx = 1
         elif hp_pct >= 0.6: face_idx = 2
@@ -132,16 +132,16 @@ def draw_vaultboy_and_cnd(screen, player_data, center_x, center_y, color):
             tinted_face.fill(color, special_flags=pygame.BLEND_RGBA_MULT)
             face_rect = tinted_face.get_rect(center=(center_x + off_x, center_y + off_y))
             screen.blit(tinted_face, face_rect)
-    # ----------------------------------------------------
-    # 2. PARTS HEALTH BAR & CRIPPLED (Riallineate al tuo Vault Boy)
-    # ----------------------------------------------------
+    # ------------------------
+    # 2. LIMBS AND POSTITIONS
+    # ------------------------
     bar_positions = {
-        'head':  (center_x - 13, center_y - 80, 32, 5), # Sopra la testa
-        'torso': (center_x - 15, center_y - 18,  32, 5), # Sul petto
-        'arm_r': (center_x - 75, center_y - 50, 28, 5), # A sinistra del braccio dx screen
-        'arm_l': (center_x + 48, center_y - 50, 28, 5), # A destra del braccio sx screen
-        'leg_r': (center_x - 75, center_y + 32, 28, 5), # A sinistra della gamba dx screen
-        'leg_l': (center_x + 46, center_y + 32, 28, 5), # A destra della gamba sx screen
+        'head':  (center_x - 13, center_y - 80, 32, 5), 
+        'torso': (center_x - 15, center_y - 18,  32, 5), 
+        'arm_r': (center_x - 75, center_y - 50, 28, 5), 
+        'arm_l': (center_x + 48, center_y - 50, 28, 5), 
+        'leg_r': (center_x - 75, center_y + 32, 28, 5), 
+        'leg_l': (center_x + 46, center_y + 32, 28, 5), 
     }
 
     crippled_text_offsets = {
@@ -152,42 +152,42 @@ def draw_vaultboy_and_cnd(screen, player_data, center_x, center_y, color):
         'leg_r': (center_x - 110, center_y + 46),
         'leg_l': (center_x + 80,  center_y + 46),
     }
-    # ----------------------------------------------------
-    # 3. CORNICI BARRE SALUTE (Geometria Pip-Boy Originale)
-    # ----------------------------------------------------
-    pad = 1            # Spazio barra-cornice
-    tri_w = 6          # Larghezza del triangolo (dalla base alla punta)
-    ext_len = 16       # Quanto si allunga la linea orizzontale verso il Vault Boy
+    # -------------------------------------------
+    # 3. HEALTH BARS (for the limbs in Condition)
+    # -------------------------------------------
+    pad = 1            
+    tri_w = 6          
+    ext_len = 16      
 
     for limb_key, (bx, by, bw, bh) in bar_positions.items():
         val = limbs.get(limb_key, 100)
         pct = max(0.0, min(1.0, val / 100.0))
 
-        # Scritta CRIPPLED se arto a 0
+        # Crippled text if limb health = 0
         if val <= 0:
             tx, ty = crippled_text_offsets[limb_key]
             crip_txt = font_small.render("CRIPPLED", True, color)
             screen.blit(crip_txt, (tx, ty))
 
-        # Riempimento barra interna
+        # Health Bar Filling
         fill_w = int((bw - 2) * pct)
         if fill_w > 0:
             pygame.draw.rect(screen, color, (bx + 1, by + 1, fill_w, bh - 2))
 
-        # --------------------------------------------------
-        # PARAMETRO ALTEZZA LINEE VERTICALI
-        # --------------------------------------------------
-        vert_height = bh - 2   # <--- CAMBIA QUESTO VALORE PER REGLARE L'ALTEZZA VERTICALE
+        # ----------------------------------------------
+        # HEIGHT OF VERTICAL LINES (IN THE HEALTH BARS)
+        # ----------------------------------------------
+        vert_height = bh - 2 
 
         top_y = by - pad
-        bottom_y = by + vert_height        # Fondo della stanghetta verticale
-        tri_bottom_y = by + bh - 3        # La base del triangolo finisce 2px prima del fondo barra
+        bottom_y = by + vert_height
+        tri_bottom_y = by + bh - 3
         left_x = bx - pad
         right_x = bx + bw + pad
 
-        # --- DISEGNO CORNICI ---
+        # --- HEALTH BARS DETAILS ---
         if limb_key in ['head', 'torso']:
-            # U Ribaltata semplice per Testa e Torso
+            # Health bar for head and torso (details look like a "U" inverted shape, without curves)
             u_points = [
                 (left_x, bottom_y),
                 (left_x, top_y),
@@ -197,12 +197,12 @@ def draw_vaultboy_and_cnd(screen, player_data, center_x, center_y, color):
             pygame.draw.lines(screen, color, False, u_points, 1)
 
         elif limb_key in ['arm_r', 'leg_r']:
-            # Arti a SINISTRA dello Schermo (Vault Boy a destra)
-            # 1. Stanghetta verticale esterna a sinistra
+            # Limbs to the left of the screen (Vault Boy's right)
+            # 1. External vertical line on the left
             pygame.draw.line(screen, color, (left_x, top_y), (left_x, bottom_y), 1)
-            # 2. Linea orizzontale superiore che si estende verso il Vault Boy
+            # 2. Upper horizontal line extending towards Vault Boy
             pygame.draw.line(screen, color, (left_x, top_y), (right_x + ext_len - 2, top_y), 1)
-            # 3. Triangolo PIENO (Base verticale sulla barra, punta verso il Vault Boy)
+            # 3. Full triangle (Vertical base on the bar, point towards Vault Boy)
             tri_points = [
                 (right_x, top_y),
                 (right_x, tri_bottom_y),
@@ -211,12 +211,12 @@ def draw_vaultboy_and_cnd(screen, player_data, center_x, center_y, color):
             pygame.draw.polygon(screen, color, tri_points, 0)
 
         elif limb_key in ['arm_l', 'leg_l']:
-            # Arti a DESTRA dello Schermo (Vault Boy a sinistra)
-            # 1. Stanghetta verticale esterna a destra
+            # Limbs to the right of the screen (Vault Boy's left)
+            # 1. External vertical line on the right
             pygame.draw.line(screen, color, (right_x, top_y), (right_x, bottom_y), 1)
-            # 2. Linea orizzontale superiore che si estende verso il Vault Boy
+            # 2. Upper horizontal line extending towards Vault Boy
             pygame.draw.line(screen, color, (right_x, top_y), (left_x - ext_len + 2, top_y), 1)
-            # 3. Triangolo PIENO (Base verticale sulla barra, punta verso il Vault Boy)
+            # 3. Full triangle (Vertical base on the bar, point towards Vault Boy)
             tri_points = [
                 (left_x, top_y),
                 (left_x, tri_bottom_y),
@@ -367,8 +367,8 @@ class GenericList:
         y = self.draw_space.top
 
         font_h = self.font.get_height()
-        item_h = font_h + 4  # Altezza del rettangolo di selezione
-        spacing = 4          # Spazio verticale tra una voce e l'altra
+        item_h = font_h + 4  # Selection rectangle height
+        spacing = 4          # Vertical spacing between items
 
         for i, item in enumerate(self.items):
             rect_x = self.draw_space.left
@@ -406,7 +406,7 @@ class ItemGrid:
         self.font = font
         self.line_height = self.font.get_height()
         self.padding = padding
-        self.padding_x = padding_x  # Padding dedicato per sinistra e destra
+        self.padding_x = padding_x  # Padding dedicated for the left and right sides of the grid
         self.precomputed_bg = []
         self.precomputed_text = []
         self.precomputed_divider = None  # Only one divider per grid
@@ -427,7 +427,7 @@ class ItemGrid:
         self.precomputed_divider = None  # Reset divider each update
         current_y = self.draw_space.top
         
-        # USA self.padding_x PER IL BORDO SINISTRO
+        # Use self.padding_x for the left side
         label_x = self.draw_space.left + self.padding_x
 
         for entry in entries:
@@ -440,7 +440,7 @@ class ItemGrid:
             icon_x = label_x
             icon_front_x = label_x
             
-            # USA self.padding_x PER IL BORDO DESTRO
+            # Use self.padding_x for the right side too
             value_x = self.draw_space.right - self.padding_x
             
             if entry.get("icon_front") and "icon" in entry:
@@ -672,7 +672,7 @@ class WireframeItem:
         with self.lock:
             for line in self.lines:
                 
-                # print the line 
+                # print the line
                 
                 pygame.draw.aaline(
                     self.screen,
@@ -785,14 +785,14 @@ def draw_nv_ui(screen, player_data, current_tab="STATS", current_subtab=0):
             screen.blit(txt, (11, side_y))
             side_y += 20
 
-        # Rendering specifico per la scheda CND
+        # Specific rendering for the "CND" submenu
         if status_side_index == 0:
-            # 1. Vault Boy e barre arti
+            # 1. Vault Boy & Health Bars
             vb_center_x = screen_w // 2 - 10
             vb_center_y = screen_h // 2 - 5
             draw_vaultboy_and_cnd(screen, player_data, vb_center_x, vb_center_y, COLOR_NV)
 
-            # 2. TESTI A DESTRA (Stimpak / Doctor's Bag)
+            # 2. RIGHT SIDE QUICK ITEMS (Stimpak, Doctor's Bag, ecc.)
             quick_items = player_data.get('quick_items', ["(5) Stimpak S)", "(3) Doctor's Bag E)"]) if isinstance(player_data, dict) else ["(5) Stimpak S)", "(3) Doctor's Bag E)"]
             item_y = 45
             for item_str in quick_items:

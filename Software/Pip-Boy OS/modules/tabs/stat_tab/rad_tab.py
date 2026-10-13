@@ -229,7 +229,7 @@ class RadSubtab:
         display_rads, _ = self._get_rad_values(player_data)
         rad_resist = player_data.get('rad_resist', getattr(settings, 'RAD_RESIST', 10))
 
-        # --- QUADRANTE ANALOGICO ---
+        # --- ANALOGIC QUADRANT ---
         margin = 8
         gauge_w = self.draw_space.width - (margin * 2)
         gauge_h = 126
@@ -242,11 +242,11 @@ class RadSubtab:
         cy = gauge_box.top + 98
         radius = 78
 
-        # --- ARCO CONTINUO LISCIO ---
+        # --- ARCH ---
         self._draw_smooth_arc(self.screen, COLOR_LIGHT, (cx, cy), radius=radius, start_deg=51, end_deg=155, width=2)
         self._draw_smooth_arc(self.screen, DANGER_COLOR, (cx, cy), radius=radius, start_deg=25, end_deg=51.5, width=2)
 
-        # --- TACCHE E VALORI NUMERICI ---
+        # --- LINES AND SCALE ---
         ticks = [0, 200, 400, 600, 800, 1000]
         for val in ticks:
             frac = val / 1000.0
@@ -254,21 +254,21 @@ class RadSubtab:
             angle_rad = math.radians(angle_deg)
             col = DANGER_COLOR if val >= 800 else COLOR_LIGHT
 
-            # Tacca principale (Lunghezza 12px, sporge leggermente all'esterno)
+            # MAIN LINES
             x1 = cx + (radius + 1) * math.cos(angle_rad)
             y1 = cy - (radius + 1) * math.sin(angle_rad)
             x2 = cx + (radius - 11) * math.cos(angle_rad)
             y2 = cy - (radius - 11) * math.sin(angle_rad)
             pygame.draw.line(self.screen, col, (int(x1), int(y1)), (int(x2), int(y2)), 2)
 
-            # Numero della scala
+            # Scale numbers
             xl = cx + (radius - 24) * math.cos(angle_rad)
             yl = cy - (radius - 24) * math.sin(angle_rad)
             t_surf = self.font.render(str(val), True, col)
             t_rect = t_surf.get_rect(center=(int(xl), int(yl)))
             self.screen.blit(t_surf, t_rect)
 
-        # Tacche intermedie (ogni 50 e 100 RAD) - Ora ben visibili e definite
+        # 50 RAD MIDDLE LINES
         for val in range(50, 1000, 50):
             if val in ticks:
                 continue
@@ -277,7 +277,7 @@ class RadSubtab:
             angle_rad = math.radians(angle_deg)
             col = DANGER_COLOR if val >= 800 else COLOR_LIGHT
 
-            # Tacche da 100 RAD lunghe 8px, tacche da 50 RAD lunghe 5px
+            # 100 RAD LONG LINES
             tick_len = 8 if (val % 100 == 0) else 5
             x1 = cx + (radius + 1) * math.cos(angle_rad)
             y1 = cy - (radius + 1) * math.sin(angle_rad)
@@ -285,11 +285,11 @@ class RadSubtab:
             y2 = cy - (radius - tick_len) * math.sin(angle_rad)
             pygame.draw.line(self.screen, col, (int(x1), int(y1)), (int(x2), int(y2)), 1)
 
-        # --- UNITA' DI MISURA (RAD / h) ---
+        # --- MEASUREMENT UNIT (RAD / h) ---
         unit_surf = self.font.render("RAD / h", True, COLOR_LIGHT)
         self.screen.blit(unit_surf, unit_surf.get_rect(center=(cx, cy - 30)))
 
-        # --- AGO ANALOGICO STANDARD ---
+        # --- STANDARD ANALOGICAL NEEDLE ---
         needle_frac = max(0.0, min(1.0, display_rads / 1000.0))
         needle_angle_deg = 155 - (needle_frac * 130)
         needle_angle_rad = math.radians(needle_angle_deg)
@@ -301,31 +301,31 @@ class RadSubtab:
         pygame.draw.circle(self.screen, COLOR_LIGHT, (cx, cy), 4)
         pygame.draw.circle(self.screen, COLOR_DARK, (cx, cy), 2)
 
-        # Lettura Digitale sotto il perno
+        # VALUE UNDER THE NEEDLE
         readout_surf = self.font_large.render(f"{display_rads:.1f}", True, COLOR_LIGHT)
         self.screen.blit(readout_surf, readout_surf.get_rect(center=(cx, cy + 14)))
 
-        # --- INFORMAZIONI ED EFFETTI INFERIORI ---
+        # --- INFO AND EFFECTS ---
         bottom_top = gauge_box.bottom + 6
         box_w = (gauge_w - 8) // 2
         box_h = 44
 
-        # Box 1: Effetti Tossicità
+        # Box 1: Toxic Effects
         eff_box = pygame.Rect(gauge_box.left, bottom_top, box_w, box_h)
         pygame.draw.rect(self.screen, COLOR_DARK, eff_box)
         pygame.draw.rect(self.screen, COLOR_LIGHT, eff_box, 1)
 
         if display_rads >= 800:
-            eff_title = "CRITICAL POISON"
+            eff_title = "CRITICAL POISONING"
             eff_desc = "-3 END, -2 AGI, -2 STR"
         elif display_rads >= 600:
-            eff_title = "SEVERE POISON"
+            eff_title = "SEVERE POISONING"
             eff_desc = "-2 END, -2 AGI"
         elif display_rads >= 400:
-            eff_title = "MODERATE POISON"
+            eff_title = "MODERATE POISONING"
             eff_desc = "-2 END, -1 AGI"
         elif display_rads >= 200:
-            eff_title = "MINOR POISON"
+            eff_title = "MINOR POISONING"
             eff_desc = "-1 END"
         else:
             eff_title = "NORMAL STATUS"
@@ -336,7 +336,7 @@ class RadSubtab:
         self.screen.blit(e_title_surf, (eff_box.left + 6, eff_box.top + 5))
         self.screen.blit(e_desc_surf, (eff_box.left + 6, eff_box.top + 22))
 
-        # Box 2: Rad Resist & Scorte Aid
+        # Box 2: Rad Resist & Supplies
         aid_box = pygame.Rect(eff_box.right + 8, bottom_top, box_w, box_h)
         pygame.draw.rect(self.screen, COLOR_DARK, aid_box)
         pygame.draw.rect(self.screen, COLOR_LIGHT, aid_box, 1)

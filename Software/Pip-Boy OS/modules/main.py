@@ -44,7 +44,7 @@ def run_app():
         with pipboy_thread_lock:
             pipboy.render()
 
-        # Controlla se è stato richiesto un restart da PipBoy/SettingsTab
+        # Checks if settings_tab.py haas requested a restart (e.g., after changing settings)
         if getattr(pipboy, 'should_restart', False):
             should_restart = True
             running = False
@@ -52,10 +52,10 @@ def run_app():
 
         clock.tick(settings.FPS)
 
-    # Ferma il loop di Pipboy
+    # Stop the Pip-Boy Loop
     pipboy.done = True
 
-    # CHIUSURA PULITA DI TUTTI I SOTTOSISTEMI
+    # CLEAN CLOSING OF ALL SUBSYSTEMS
     try:
         pygame.mixer.music.stop()
         pygame.mixer.quit()
@@ -68,7 +68,7 @@ def run_app():
 
 def main():
     while True:
-        # Ricarica il modulo settings se presente per assicurarsi i valori aggiornati
+        # Reload settings.py to apply any changes made in the file without restarting the application.
         import importlib
         importlib.reload(settings)
         

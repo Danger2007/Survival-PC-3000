@@ -29,8 +29,7 @@ class EffSubtab:
             empty_txt = self.font_large.render("NO ACTIVE EFFECTS", True, COLOR_NV)
             self.screen.blit(empty_txt, empty_txt.get_rect(center=(screen_w // 2 + 20, screen_h // 2)))
             return
-
-        # Posizionamento allineato all'interfaccia originale New Vegas
+        # Positioning/rendering effects list
         start_x = 40
         max_w = screen_w - start_x - 10
         curr_y = 37

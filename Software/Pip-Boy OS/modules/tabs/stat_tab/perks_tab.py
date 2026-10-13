@@ -5,7 +5,7 @@ import settings
 
 
 def draw_star(surface, color, center, outer_radius=6, inner_radius=2.2, filled=True, width=1):
-    """Disegna una stella vettoriale a 5 punte con base delle punte ridotta."""
+    """Draws a star shape on the given surface."""
     points = []
     angle = -math.pi / 2
     step = math.pi / 5
@@ -24,7 +24,7 @@ def draw_star(surface, color, center, outer_radius=6, inner_radius=2.2, filled=T
 
 
 def colorize_surface(surface, color):
-    """Applica la tinta del Pip-Boy a un'icona conservandone l'alpha."""
+    """Applies a color tint."""
     if surface is None:
         return None
     tinted = surface.copy()
@@ -35,8 +35,8 @@ def colorize_surface(surface, color):
 
 class PerksTab:
     """
-    Gestisce la tab dei Perks nel Pip-Boy rispecchiando il layout originale di
-    Fallout: New Vegas e Fallout 4.
+    Manages the display and interaction of the Perks tab in the Pip-Boy interface.
+    It handles rendering the list of perks, their descriptions, images, and user input for navigation.
     """
     def __init__(self, screen, tab_base=None, draw_space=None):
         self.screen = screen
@@ -104,7 +104,7 @@ class PerksTab:
         return False
 
     def _load_and_scale_img(self, img_path, max_size, cache_key):
-        """Carica l'immagine (Pygame/PIL) e la scala mantenendo le proporzioni."""
+        """Loads and scales an image while maintaining aspect ratio."""
         surf = None
         try:
             surf = pygame.image.load(img_path).convert_alpha()
@@ -131,7 +131,7 @@ class PerksTab:
         return None
 
     def _get_perk_image(self, perk, max_size=(80, 80)):
-        """Risolve i percorsi delle immagini partendo dalla radice fuori da modules."""
+        """Finds the image/icon for a perk, searching in various directories and applying caching."""
         ui_style = str(getattr(settings, 'UI_STYLE', '')).lower()
         is_nv = 'nv' in ui_style or 'vegas' in ui_style
         
@@ -228,7 +228,7 @@ class PerksTab:
         return lines
 
     def _render_fallout_nv_ui(self):
-        """Layout SKILLS/PERKS per Fallout: New Vegas."""
+        """Layout SKILLS/PERKS for Fallout: New Vegas."""
         color = getattr(settings, 'PIP_BOY_LIGHT', (0, 255, 0))
         screen_w = settings.SCREEN_WIDTH
         screen_h = settings.SCREEN_HEIGHT
@@ -254,7 +254,7 @@ class PerksTab:
         scroll_offset = max(0, min(self.selected_index - MAX_VISIBLE_ITEMS // 2, total_items - MAX_VISIBLE_ITEMS))
         scroll_offset = max(0, scroll_offset)
 
-        # --- CONTROLLI SCROLLER A SINISTRA ---
+        # --- SCROLLBAR ---
         slider_x = left_x - 18
         arrow_w = 5
         arrow_h = 8
@@ -293,7 +293,7 @@ class PerksTab:
             bar_bottom = bar_top + bar_length
             pygame.draw.line(self.screen, color, (slider_x, bar_top), (slider_x, bar_bottom), 2)
 
-        # --- LISTA PERKS A SINISTRA ---
+        # --- LEFT PANEL (PERK LIST) ---
         visible_perks = self.perks_data[scroll_offset : scroll_offset + MAX_VISIBLE_ITEMS]
         
         for idx_in_view, perk in enumerate(visible_perks):
@@ -312,7 +312,7 @@ class PerksTab:
             text_surf = font_main.render(display_text, True, color)
             self.screen.blit(text_surf, (left_x, y_pos + (LINE_HEIGHT - text_surf.get_height()) // 2))
 
-        # --- PANNELLO DESTRO ---
+        # --- RIGHT PANEL ---
         if 0 <= self.selected_index < total_items:
             selected_perk = self.perks_data[self.selected_index]
             
@@ -342,7 +342,7 @@ class PerksTab:
                 curr_y += font_desc.get_height() + 2
 
     def _render_fallout4_ui(self):
-        """Layout Fallout 4 con descrizioni dinamiche in base al grado del Perk."""
+        """FO4-style layout for Perks tab, with dynamic description and rank stars."""
         color_light = getattr(settings, 'PIP_BOY_LIGHT', (0, 255, 0))
         font_main = self._get_font(11)
         font_small = self._get_font(9)
@@ -358,7 +358,7 @@ class PerksTab:
         elif self.selected_index >= self.scroll_offset + max_visible_items:
             self.scroll_offset = self.selected_index - max_visible_items + 1
 
-        # --- LISTA A SINISTRA ---
+        # --- LEFT PANEL (PERK LIST) ---
         visible_perks = self.perks_data[self.scroll_offset : self.scroll_offset + max_visible_items]
         for i, perk in enumerate(visible_perks):
             actual_idx = self.scroll_offset + i
@@ -375,7 +375,7 @@ class PerksTab:
 
             self.screen.blit(text_surf, (x_left, item_y))
 
-        # --- PANNELLO DESTRO (VAULT BOY + STELLE + DESCRIZIONE DEL RANK CORRENTE) ---
+        # --- RIGHT PANEL (PERK IMAGE + STARS + CURRENT RANK DESCRIPTION) ---
         if 0 <= self.selected_index < len(self.perks_data):
             selected_perk = self.perks_data[self.selected_index]
             x_right = x_left + list_width + 12
@@ -390,7 +390,7 @@ class PerksTab:
                 self.screen.blit(colored_img, (img_x, current_y))
                 current_y += colored_img.get_height() + 4
 
-            # DETERMINAZIONE DEL RANK E DELLA DESCRIZIONE SPECIFICA
+            # RANK AND DESCRIPTION
             rank = int(self._get_field(selected_perk, 'rank', 1))
             rank_descs = self._get_field(selected_perk, 'rank_descs', None)
             ranks_data = self._get_field(selected_perk, 'ranks', None)
@@ -408,7 +408,7 @@ class PerksTab:
                 max_rank = int(self._get_field(selected_perk, 'max_rank', 5))
                 desc_text = str(self._get_field(selected_perk, 'desc', ''))
 
-            # INDICATORI STELLE VETTORIALI
+            # VECTORIAL STAR DRAWING FOR RANK INDICATOR
             star_spacing = 14
             total_stars_w = max_rank * star_spacing
             start_star_x = x_right + (right_width - total_stars_w) // 2 + (star_spacing // 2)

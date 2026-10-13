@@ -8,12 +8,10 @@ class StatTab:
         self.screen = screen
         self.tab_instance = tab_instance
         self.draw_space = draw_space
-
-        # Font ridimensionati per matchare l'interfaccia principale del Pip-Boy
+        # Fonts :)
         self.font = pygame.font.Font(settings.ROBOTO_BOLD_PATH, 10)
         self.font_small = pygame.font.Font(settings.ROBOTO_BOLD_PATH, 9)
 
-        # Categorie e relative statistiche
         self.categories = [
             {
                 "name": "General",
@@ -73,10 +71,9 @@ class StatTab:
 
         self.selected_category = 0
 
-        # --- CALCOLO DIVISIONE E PADDING ORIZZONTALE ---
-        left_w = int((self.draw_space.width + 15) / 2)  # Spazio tra elenchi invariato
+        # --- CALCULATION OF DIVISION AND HORIZONTAL PADDING ---
+        left_w = int((self.draw_space.width + 15) / 2) #space between left and right panels
         
-        # Aggiungiamo 5px a sinistra e togliamo 10px totali dalla larghezza (5px a sx + 5px a dx)
         padding_x = 5
         grid_left = self.draw_space.left + left_w + padding_x
         grid_top = self.draw_space.top + 8
@@ -88,12 +85,12 @@ class StatTab:
         self.item_grid = ItemGrid(
             draw_space=grid_rect,
             font=self.font,
-            padding=1  # Lasciamo il padding verticale di ItemGrid inalterato
+            padding=1
         )
         self._update_grid()
 
     def _update_grid(self):
-        """Aggiorna le voci della griglia in base alla categoria selezionata."""
+        """Update the item grid with the stats of the currently selected category."""
         if 0 <= self.selected_category < len(self.categories):
             selected_cat = self.categories[self.selected_category]
             entries = [{"label": k, "value": v} for k, v in selected_cat["stats"]]
@@ -101,12 +98,12 @@ class StatTab:
                 self.item_grid.update(entries)
 
     def scroll(self, direction: bool):
-        """Scroll tra le categorie di statistiche (Invertito: True -> Su, False -> Giù)"""
+        """Scroll between categories."""
         prev_index = self.selected_category
-        if direction:  # Su
+        if direction:  # Up
             if self.selected_category > 0:
                 self.selected_category -= 1
-        else:  # Giù
+        else:  # Down
             if self.selected_category < len(self.categories) - 1:
                 self.selected_category += 1
 
@@ -120,7 +117,7 @@ class StatTab:
         left_margin = self.draw_space.left
         row_h = self.font.get_linesize() + 6
 
-        # --- PANNELLO SINISTRO ---
+        # --- LEFT PANEL ---
         left_w = int((self.draw_space.width + 15) / 2)
         y = self.draw_space.top + 8
 
@@ -135,17 +132,17 @@ class StatTab:
             else:
                 text_color = pip_light
 
-            # Scritta elenco sinistro (spostata di 5px verso destra dal margine base 6px -> 11px)
+            # Text left list
             cat_surf = self.font.render(cat["name"], True, text_color)
             cat_rect = cat_surf.get_rect(midleft=(left_margin + 11, item_rect.centery))
             self.screen.blit(cat_surf, cat_rect)
 
             y += row_h
 
-        # --- PANNELLO DESTRO (Griglia Statistiche) ---
+        # --- RIGHT PANEL (Item Grid) ---
         if self.item_grid:
             self.item_grid.render(self.screen)
 
 
-# Alias per garantire retrocompatibilità con TabManager
+# Alias for backward compatibility or easier imports with tab_manager.py
 StatsTab = StatTab

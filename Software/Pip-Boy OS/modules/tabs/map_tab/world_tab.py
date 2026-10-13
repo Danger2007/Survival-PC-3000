@@ -98,8 +98,8 @@ class BaseMap:
 
     def navigate(self, direction: int):
         """
-        Move the map view in one of four directions.
-        :param direction: 0: right, 1: down, 2: up, 3: left.
+        Move the map view in one of four directions:
+         0: right, 1: down, 2: up, 3: left.
         """
         if 0 <= direction < 4:
             if not isinstance(self.map_offset, Vector2):
@@ -141,7 +141,7 @@ class WorldMap(BaseMap):
 
 
 class RealMap(BaseMap):
-    """Dynamic real-world map using Geoapify and OpenStreetMap API."""    
+    """Dynamic real-world map using Geoapify API."""    
 
     def __init__(self, screen: pygame.Surface, draw_space: pygame.Rect, 
                  api_zoom: int = 13):
@@ -187,7 +187,6 @@ class RealMap(BaseMap):
         super().__init__(self.screen, self.draw_space, rendered_map)
 
     def _invert_surface(self, surface: pygame.Surface) -> pygame.Surface:
-        """Converte la superficie in scala di grigi ed inverte usando PIL per eliminare ogni sfumatura di colore."""
         # Converts the Pygame Surface in a string of Pixel RGB values
         raw_str = pygame.image.tostring(surface, 'RGBA')
         pil_img = Image.frombytes('RGBA', surface.get_size(), raw_str)

@@ -5,8 +5,6 @@ from threading import Thread
 from data_models import IconConfig
 from typing import Dict, List
 from util_functs import Utils
-
-# Import dei moduli sotto-schede con sintassi relativa
 from .rad_tab import RadSubtab
 from .eff_tab import EffSubtab
 
@@ -21,11 +19,11 @@ class StatusTab:
         self.conditionboy_thread_running = False
         self.small_font = pygame.font.Font(settings.ROBOTO_CONDENSED_BOLD_PATH, 12)
         
-        # Inizializzazione moduli sotto-schede per New Vegas
+        # Initialize the RAD and EFF subtabs for New Vegas style
         self.rad_subtab = RadSubtab(self.screen, self.draw_space)
         self.eff_subtab = EffSubtab(self.screen, self.draw_space)
 
-        # Inizializzazione componenti Vault Boy per Fallout 4
+        # Initialize the FO4's conditionboy animation and related surfaces
         self._init_conditionboy()
         self.player_surface = self.small_font.render(settings.PLAYER_NAME, True, settings.PIP_BOY_LIGHT)
         
@@ -272,7 +270,7 @@ class StatusTab:
         side_index = p_data.get('status_side_index', 0)
         ui_style = str(getattr(settings, 'UI_STYLE', '')).lower()
 
-        # In FO4 gira sempre; in NV style gira solo per CND (side_index 0)
+        # In FO4 it always runs, in NV it only runs when the side index is 0 (CND tab)
         should_run = tab_selected and (ui_style != 'fallout_nv' or side_index == 0)
 
         if should_run and not self.conditionboy_thread_running:
@@ -303,7 +301,7 @@ class StatusTab:
                 self.eff_subtab.render(p_data, ui_style)
                 return
 
-            # Subtab CND (0): la grafica centrale è renderizzata da ui.draw_nv_ui
+            # Subtab CND (0)
             return
 
         # --- RENDERING FALLOUT 4 ---
@@ -314,7 +312,7 @@ class StatusTab:
         if hasattr(self, 'limb_damage_surface'):
             self.render_limb_damage()
 
-    # --- METODI HELPER RENDERING FALLOUT 4 (Ripristinati) ---
+    # --- HELPER RENDERING METHODS FOR FALLOUT 4 ---
     def render_conditionboy(self):
         self.screen.blit(self.conditionboy_surface, self.conditionboy_screen_position)
 

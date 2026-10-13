@@ -24,7 +24,7 @@ class RadioStationLoader:
                         tag = TinyTag.get(entry.path)
                         music_files[entry.path] = int(tag.duration * 1000) if tag.duration else 180000
                     except Exception:
-                        # Se TinyTag fallisce nel calcolare la durata, assegna un valore predefinito (3 min)
+                        # If the duration cannot be read, default to 3 minutes
                         music_files[entry.path] = 180000
         except Exception:
             pass
@@ -54,7 +54,7 @@ class RadioStationLoader:
                 return None
             
             ini_path = os.path.join(entry.path, "station.ini")
-            # Nome di default basato sulla cartella
+            # Default station name is the folder name with underscores replaced by spaces
             station_name = entry.name.replace('_', ' ')
             ordered = False
 

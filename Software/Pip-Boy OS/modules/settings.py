@@ -75,9 +75,10 @@ SCREEN_WIDTH = 320
 SCREEN_HEIGHT = 255
 FPS = 24
 FULLSCREEN = True if RASPI else False 
+SCREENSAVER_TIMEOUT = 60
 BACKGROUND = (0, 0, 0)
 PIP_BOY_LIGHT = (0, 255, 0)
-# Ricalcola sempre i colori scuri in base a PIP_BOY_LIGHT corrente
+# Always define PIP_BOY_MID, PIP_BOY_MIDDLE, PIP_BOY_DARK, and PIP_BOY_DARKER based on PIP_BOY_LIGHT
 if 'PIP_BOY_LIGHT' in globals():
     PIP_BOY_MID = (int(PIP_BOY_LIGHT[0] * 0.5), int(PIP_BOY_LIGHT[1] * 0.5), int(PIP_BOY_LIGHT[2] * 0.5))
     PIP_BOY_MIDDLE = PIP_BOY_MID
@@ -156,10 +157,10 @@ _inventory.add_item(items['Fusion Cell'], 25)
 _inventory.add_item(items['10mm Round'], 37)
 _inventory.add_item(items['Mini Nuke'])
 
-# Esportazione lista base per le schede dell'inventario
+# Export the inventory list for use in other modules
 INV_BASE = _inventory.get_all_items()
 
-# Calcolo dei bonus S.P.E.C.I.A.L.
+# Calculate S.P.E.C.I.A.L. bonuses
 SPECIAL_KEYS = ['STR', 'PER', 'END', 'CHR', 'INT', 'AGI', 'LUK']
 for item in _inventory.get_all_items():
     if hasattr(item, 'special_bonuses') and isinstance(item.special_bonuses, dict):

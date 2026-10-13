@@ -75,18 +75,18 @@ class Utils:
     def get_date():
         now = datetime.datetime.now()
         
-        # Prova ad importare user_config per leggere i valori salvati dall'utente
+        # user_config.py reading (if it fails it uses the default values in settings.py)
         try:
             import user_config
         except ImportError:
             user_config = None
 
-        # 1. Legge DATE_MODE (da user_config se c'è, altrimenti settings)
+        # 1. Reads DATE_MODE
         date_mode = getattr(user_config, 'DATE_MODE', None) if user_config else None
         if date_mode is None:
             date_mode = getattr(settings, 'DATE_MODE', 'Game')
 
-        # 2. Legge UI_STYLE
+        # 2. Reads UI_STYLE
         ui_style = getattr(user_config, 'UI_STYLE', None) if user_config else None
         if ui_style is None:
             ui_style = getattr(settings, 'UI_STYLE', '')
@@ -94,11 +94,11 @@ class Utils:
 
         current_date = f"{now.day}.{now.month}"
 
-        # 3. Determina l'anno in base a DATE_MODE
+        # 3. Get year using DATE_MODE and UI_STYLE ( Game = Year from the game and UI_STYLE indicates the game, Real = Current year)
         if str(date_mode).lower() == 'real':
             current_year = now.strftime("%Y")
         else:
-            # Modalità 'Game'
+            # 'Game' Mode
             if 'nv' in ui_style or 'vegas' in ui_style:
                 current_year = "2281"
             else:

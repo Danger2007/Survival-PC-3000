@@ -14,7 +14,6 @@ class QuestsTab:
         self.ui_style = str(getattr(settings, 'UI_STYLE', 'Fallout_4')).lower()
         self.is_nv = any(k in self.ui_style for k in ['nv', 'new_vegas', 'newvegas', 'fnv'])
 
-        # Font (+2px per lo stile Fallout 4)
         self.font_main = pygame.font.Font(settings.ROBOTO_BOLD_PATH, 10 if self.is_nv else 11)
         self.font_header = pygame.font.Font(settings.ROBOTO_BOLD_PATH, 11 if self.is_nv else 14)
         self.font_small = pygame.font.Font(settings.ROBOTO_BOLD_PATH, 8 if self.is_nv else 11)
@@ -177,7 +176,7 @@ class QuestsTab:
         self._load_vaultboy_frame()
 
     def _get_visible_objectives(self, quest):
-        """Restituisce solo gli obiettivi completati (done) o correnti (current)."""
+        """Renderds only the objectives that are either done or current for the given quest."""
         return [
             obj for obj in quest.get("objectives", [])
             if obj.get("done", False) or obj.get("current", False)
@@ -267,7 +266,7 @@ class QuestsTab:
         return False
 
     def _is_quest_fully_visible(self, target_idx, offset):
-        """Verifica se la quest target_idx viene renderizzata interamente con l'offset fornito."""
+        """Verifies if the quest at target_idx is fully rendered with the given offset."""
         y_cursor = self.list_rect.top + (0 if self.is_nv else 8)
         line_height = self.font_main.get_height() + (2 if self.is_nv else 1)
         padding = 4 if self.is_nv else 2
@@ -302,7 +301,7 @@ class QuestsTab:
         return False
 
     def _is_step_fully_visible(self, objectives, target_idx, offset):
-        """Verifica se lo step target_idx viene renderizzato interamente con l'offset fornito."""
+        """Verifies if the step at target_idx is fully rendered with the given offset."""
         if self.is_nv:
             y_top = self.draw_space.top + 2
             start_steps_y = y_top + 36
@@ -444,8 +443,8 @@ class QuestsTab:
                 pygame.draw.line(self.screen, color, (x, track_top), (x, track_bottom), 3)
 
     def render(self):
-        color_light = getattr(settings, "PIP_BOY_LIGHT", (0, 255, 0))
-        color_middle = getattr(settings, "PIP_BOY_MIDDLE", (0, 191, 0))
+        color_light = getattr(settings, "PIP_BOY_LIGHT", (255, 255, 0))
+        color_middle = getattr(settings, "PIP_BOY_MID", getattr(settings, "PIP_BOY_MIDDLE", (125, 127, 0)))
 
         if self.is_nv:
             self._render_nv_list(color_light, color_middle)
@@ -457,7 +456,7 @@ class QuestsTab:
                 self._render_fo4_details(self.quests[self.selected_index], color_light, color_middle)
 
     def _draw_fo4_double_arrow(self, x, y, pointing_up, color):
-        """Disegna una freccia doppia (chevron doppio) in stile Fallout 4 orientata correttamente."""
+        """Draws a double arrow (two stacked arrows) for FO4 style."""
         if pointing_up:
             pts1 = [(x, y + 3), (x + 4, y), (x + 8, y + 3)]
             pts2 = [(x, y + 7), (x + 4, y + 4), (x + 8, y + 7)]
@@ -472,13 +471,13 @@ class QuestsTab:
     # LOGICA FALLOUT 4
     # ==========================================
     def _render_fo4_list(self, color_light, color_middle):
-        """Renderizza la lista quest FO4 usando la scroll offset e frecce doppie."""
+        """Renders the quest list for Fallout 4 style, using scroll offset and double arrows."""
         y_cursor = self.list_rect.top + 8
         padding = 2
         line_height = self.font_main.get_height() + 1
         max_y = self.list_rect.bottom - 12
 
-        # Freccia Superiore Doppia Quest (Punta verso l'alto)
+        # Upper double arrow for FO4 quest list (pointing up)
         if self.quest_scroll_offset > 0:
             arrow_x = self.list_rect.left + 15
             arrow_y = self.list_rect.top - 10
@@ -509,7 +508,6 @@ class QuestsTab:
 
             is_selected = (original_idx == self.selected_index and not self.focus_on_desc)
 
-            # Il rettangolo di selezione parte da x=0 e copre l'ampiezza fino al bordo destro della lista
             item_rect = pygame.Rect(0, y_cursor, self.list_rect.left + self.list_rect.width, item_h)
 
             if is_selected:
@@ -533,14 +531,14 @@ class QuestsTab:
             y_cursor += item_h + 2
             rendered_count += 1
 
-        # Freccia Inferiore Doppia Quest (Punta verso il basso)
+        # Lower double arrow for FO4 quest list (pointing down)
         if self.quest_scroll_offset + rendered_count < len(self.quests):
             arrow_x = self.list_rect.left + 15
             arrow_y = self.list_rect.bottom - 4
             self._draw_fo4_double_arrow(arrow_x, arrow_y, pointing_up=False, color=color_light)
 
     def _render_fo4_details(self, quest, color_light, color_middle):
-        """Renderizza Vault Boy e gli obiettivi FO4 con frecce doppie allineate a sinistra."""
+        """Renders Vault Boy and FO4 details for the selected quest, including objectives with checkmarks and highlighting."""
         vb_center_x = self.details_rect.left + (self.details_rect.width // 2) - 10
         vb_y = self.details_rect.top
 
@@ -558,10 +556,9 @@ class QuestsTab:
 
         objectives = self._get_visible_objectives(quest)
 
-        # Posiziona la freccia a sinistra
         arrow_x = self.details_rect.left + 2
 
-        # Freccia Superiore Objectives (Punta verso l'alto)
+        # Upper double arrow
         if self.obj_scroll_offset > 0:
             arrow_y = start_y - 12
             self._draw_fo4_double_arrow(arrow_x, arrow_y, pointing_up=True, color=color_light)
@@ -618,7 +615,7 @@ class QuestsTab:
             y_cursor += step_h + spacing
             rendered_count += 1
 
-        # Freccia Inferiore Objectives (Punta verso il basso)
+        # Lower double arrow
         if self.obj_scroll_offset + rendered_count < len(objectives):
             arrow_y = max_bottom + 2
             self._draw_fo4_double_arrow(arrow_x, arrow_y, pointing_up=False, color=color_light)

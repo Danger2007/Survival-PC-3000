@@ -5,7 +5,7 @@ import settings
 _SKILL_ICON_CACHE = {}
 
 def find_image_file(skill_name):
-    """Cerca il file immagine gestendo sia PascalCase che casi speciali e percorsi assoluti."""
+    """Searches for the image file associated with a skill name."""
     clean_name = skill_name.strip()
     
     name_map = {
@@ -46,7 +46,7 @@ def find_image_file(skill_name):
 
 
 def load_skill_icon(skill_name):
-    """Carica l'immagine dalla cache o dal disco con fallback PIL per webp/dds."""
+    """Loads the skill icon image for a given skill name, using caching to avoid reloading."""
     if skill_name in _SKILL_ICON_CACHE:
         return _SKILL_ICON_CACHE[skill_name]
         
@@ -76,7 +76,7 @@ def load_skill_icon(skill_name):
 
 
 def colorize_surface(surface, color):
-    """Applica la tinta del Pip-Boy a un'icona bianca conservandone l'alpha."""
+    """Applies a color tint to the icons."""
     if surface is None:
         return None
     
@@ -219,10 +219,10 @@ def draw_skills_tab(screen, skills_data, selected_index, color, base_font, scree
             scale = min(img_rect.width / orig_w, img_rect.height / orig_h)
             new_size = (int(orig_w * scale), int(orig_h * scale))
             
-            # Scalatura uniforme
+            # Uniform scaling to fit within the designated area
             scaled_img = pygame.transform.smoothscale(icon_surface, new_size)
             
-            # Ricolorazione dinamica in base al colore del Pip-Boy
+            # Dynamic colorization based on the selected color theme
             colored_img = colorize_surface(scaled_img, color)
             
             center_x = right_x + (right_w - new_size[0]) // 2

@@ -12,7 +12,7 @@ class ApparelTab(InvBase):
         self.tab_instance = tab_instance
         self.footer_font = getattr(tab_instance, 'footer_font', pygame.font.Font(settings.ROBOTO_BOLD_PATH, 10))
         
-        # Inizializzazione icone
+        # Icons Initialization
         self._init_apparel_icons()
 
         super().__init__(
@@ -28,7 +28,7 @@ class ApparelTab(InvBase):
         if self.no_items:
             return
 
-        # Inizializzazione ItemGrid per la visualizzazione delle statistiche (Stile FO4)
+        # Inizializes ItemGrid for displaying item details in Fallout 4 style
         if not self.is_nv:
             self.item_grid = ItemGrid(
                 draw_space=self.calculate_grid_space(),
@@ -40,7 +40,7 @@ class ApparelTab(InvBase):
                 self.item_grid.update(entries)
 
     def _init_apparel_icons(self):
-        """Inizializza le icone specifiche per l'interfaccia di Apparel."""
+        """Initializes the icons for armor and defense based on settings."""
         self.big_icon_size = settings.BOTTOM_BAR_HEIGHT - (settings.BOTTOM_BAR_HEIGHT // 4)
         self.small_icon_size = settings.BOTTOM_BAR_HEIGHT - (settings.BOTTOM_BAR_HEIGHT // 2)
 
@@ -59,11 +59,11 @@ class ApparelTab(InvBase):
         total_dr = 0
         total_dt = 0
 
-        # Se passato un singolo oggetto o tutta la lista
+        # If we pass a specific list of active apparel, use that; otherwise, use the unique_items list
         if active_apparel:
             items_to_check = active_apparel if isinstance(active_apparel, (list, tuple)) else [active_apparel]
             for item in items_to_check:
-                # Se valutiamo il totale equipaggiato oppure il singolo oggetto selezionato
+                # Check if the item is equipped or if it's the only item in the list
                 if getattr(item, 'equipped', False) or getattr(item, 'is_equipped', False) or len(items_to_check) == 1:
                     total_dr += getattr(item, 'dr', getattr(item, 'damage_res', getattr(item, 'defense', 0)))
                     total_dt += getattr(item, 'dt', getattr(item, 'damage_threshold', 0))

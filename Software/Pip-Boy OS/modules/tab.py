@@ -79,18 +79,18 @@ class Tab:
         now = datetime.datetime.now()
         self.current_date = now.strftime("%d.%m.")
         
-        # 1. Recupera DATE_MODE da user_config (se presente), altrimenti da settings
+        # 1. Get the date mode from user_config if available, otherwise fallback to settings
         date_mode = getattr(user_config, 'DATE_MODE', None) if user_config else None
         if date_mode is None:
             date_mode = getattr(settings, 'DATE_MODE', 'Game')
             
-        # 2. Recupera UI_STYLE nello stesso modo per sicurezza
+        # 2. Get the UI style from user_config if available, otherwise fallback to settings
         ui_style = getattr(user_config, 'UI_STYLE', None) if user_config else None
         if ui_style is None:
             ui_style = getattr(settings, 'UI_STYLE', '')
         ui_style = str(ui_style).lower()
 
-        # 3. Imposta l'anno in base al valore effettivamente sovrascritto
+        # 3. Set the current year based on the date mode and UI style
         if date_mode == 'Real':
             self.current_year = now.strftime("%Y")
         elif date_mode == 'Game':
@@ -139,7 +139,7 @@ class Tab:
         
     # Update footer and only the part of the footer that needs to be updated    
     def update_footer(self, object, text_surface, destination=(0, 0)):
-        # clear the nescary part of the footer
+        # clear the necessary part of the footer
         self.tab_footers[object].fill(settings.PIP_BOY_DARK, (destination[0], destination[1], text_surface.get_width(), text_surface.get_height()))
         
         # Blit the updated text to the footer
