@@ -62,9 +62,15 @@
 
 ### PARTS NOT MINE:
 
--3d Model of the casing [Source](https://ytec3d.com/pip-boy/)
+-**3d Model of the casing:** I used [This 3D Pip-Boy case](https://ytec3d.com/pip-boy/) as a base and then heavily modified it to make space for the hardwware
 
--Pip-Boy menu [Source](https://github.com/kelmes1/pipboy-pi/tree/main)
+-**Pip-Boy menu:** I used [This Pip-Boy menu on github](https://github.com/kelmes1/pipboy-pi/tree/main) as a base to develop my code (the code has suffered extreme changes, only a few files remained unchanged)
+
+-**Icons:** they are taken from the [Iconify archive](https://icon-sets.iconify.design/ ) and all have MIT or Apache 2.0 licensing (No attribution required, commercial use is allowed)
+
+-**Songs:** they are taken from the [Internet Archive](https://archive.org/search?query=78+rpm+records&tab=all ) and are all 78 rpm songs from 1930s/1940s that are in the public domain
+
+-**SFXs:** they are from the original Pip-Boy menu
 
 ### Instruments:
 
