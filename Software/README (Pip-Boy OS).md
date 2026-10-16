@@ -43,6 +43,6 @@ The Pip-Boy OS uses for input:
 - **ENTER**: To equip/unequip weapons/armor, to activate/disactivate quests, to chenge between the Reputation and General tabs in the Fallout: New Vegas STATS Menu
 
 ## Important information
-- **This version might not work on the SPC 3000**: As I don't currently have the hardware I cannot check;
-- **The Code can change**: If you see this README, it means that I shipped a DEMO of the software, a WIP with all UI elements working;
-- **Not everything from the games is in the code**: I don't have enough time to insert all missions/notes/weaons etc... so for the Stardance event I'll just leave some elements from the games and some fallback Images to ease future additions.
+- **This version might not work on the SPC 3000**: As I don't currently have the hardware, I cannot check;
+- **Not everything from the games is in the code**: I don't have enough time to insert all missions/notes/weaons etc... so for the Stardance event I'll just leave some elements from the games and some fallback Images to ease future additions;
+- **The Firmware is in the code**: To interface with the hardware correctly, I've made a file called [hardware inputs]() that trasforms the GPIO inputs in Pygame buttons.
