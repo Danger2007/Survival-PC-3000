@@ -9,7 +9,6 @@ from util_functs import Utils
 from .radio_station_loader import RadioStationLoader
 from .playlist_manager import PlaylistManager
 from .visualizer import Visualizer
-from ui import GenericList
 
 
 class NVRadioList:
@@ -78,6 +77,75 @@ class NVRadioList:
             screen.blit(text_surf, (text_x, text_y))
 
 
+class F4RadioList:
+    def __init__(self, draw_space: pygame.Rect, font: pygame.font.Font):
+        self.draw_space = draw_space
+        self.font = font
+        self.items = []
+        self.selected_index = 0
+        self.scroll_offset = 0
+        self.visible_count = 8
+
+    def set_items(self, items):
+        self.items = items
+        self.selected_index = max(0, min(self.selected_index, len(items) - 1))
+
+    def change_selection(self, direction: bool):
+        if not self.items:
+            return
+        if direction: # Up
+            self.selected_index = max(0, self.selected_index - 1)
+        else: # Down
+            self.selected_index = min(len(self.items) - 1, self.selected_index + 1)
+
+        if self.selected_index < self.scroll_offset:
+            self.scroll_offset = self.selected_index
+        elif self.selected_index >= self.scroll_offset + self.visible_count:
+            self.scroll_offset = self.selected_index - self.visible_count + 1
+
+    def render(self, screen, active_station_index, station_playing):
+        if not self.items:
+            return
+
+        visible_items = self.items[self.scroll_offset : self.scroll_offset + self.visible_count]
+        item_height = 24
+        
+        for i, item_text in enumerate(visible_items):
+            actual_index = self.scroll_offset + i
+            is_selected = (actual_index == self.selected_index)
+            is_active = (actual_index == active_station_index and station_playing)
+
+            item_rect = pygame.Rect(
+                self.draw_space.left,
+                self.draw_space.top + settings.LIST_TOP_MARGIN + (i * item_height),
+                self.draw_space.width,
+                item_height - 4
+            )
+
+            # Sfondo pieno di selezione stile Fallout 4
+            if is_selected:
+                pygame.draw.rect(screen, settings.PIP_BOY_LIGHT, item_rect)
+                text_color = settings.BACKGROUND
+                square_color = settings.BACKGROUND
+            else:
+                text_color = settings.PIP_BOY_LIGHT
+                square_color = settings.PIP_BOY_LIGHT
+
+            # Quadrato indicatore per la stazione attiva con spazio a sinistra
+            if is_active:
+                sq_size = 6
+                sq_x = item_rect.left + 4
+                sq_y = item_rect.centery - (sq_size // 2)
+                sq_rect = pygame.Rect(sq_x, sq_y, sq_size, sq_size)
+                pygame.draw.rect(screen, square_color, sq_rect)
+
+            text_x = item_rect.left + 16
+            text_y = item_rect.centery - (self.font.get_height() // 2)
+
+            text_surf = self.font.render(item_text, True, text_color)
+            screen.blit(text_surf, (text_x, text_y))
+
+
 class RadioTab:
     def __init__(self, screen, tab_instance, draw_space: pygame.Rect):
         self.screen = screen
@@ -109,11 +177,7 @@ class RadioTab:
         if self.is_nv:
             self.station_list = NVRadioList(list_draw_space, self.main_font)
         else:
-            self.station_list = GenericList(
-                draw_space=list_draw_space,
-                font=self.main_font,
-                enable_dot=True
-            )
+            self.station_list = F4RadioList(list_draw_space, self.main_font)
 
         self.station_playing = False
         self.active_station_index = None

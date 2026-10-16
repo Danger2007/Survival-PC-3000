@@ -4,10 +4,11 @@ import sys
 import subprocess
 import pygame
 import settings
-from pipboy import PipBoy
-import threading
-from input_manager import InputManager
 import boot
+import threading
+from pipboy import PipBoy
+from input_manager import InputManager
+from hardware_input import HardwareInputManager
 
 def run_app():
     if settings.RASPI:
@@ -28,7 +29,7 @@ def run_app():
     boot_sequence.run()
     
     input_manager = InputManager()
-
+    hw_inputs = HardwareInputManager()
     pipboy = PipBoy(screen, clock, input_manager)
     pipboy_thread = threading.Thread(target=pipboy.run)
     pipboy_thread.daemon = True

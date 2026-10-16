@@ -338,6 +338,3 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 USER_CONFIG_PATH = os.path.join(CURRENT_DIR, 'user_config.py')
 if os.path.exists(USER_CONFIG_PATH):
     from user_config import *
-    
-GEOAPIFY_KEY = 'YOUR_GEOAPIFY_KEY'
-GEOAPIFY_API_KEY = 'YOUR_GEOAPIFY_KEY'

@@ -115,7 +115,13 @@ class ClockTab:
     def _start_weather_thread(self):
         def fetch_weather():
             try:
-                location = getattr(settings, 'FAKE_LOCATION', 'Rome')
+                # Checks if REAL_LOCATION is defined in settings.py (as settings imports REAL_LOCATION from settings_secret this check is always true)
+                location = getattr(settings, 'REAL_LOCATION', None)
+                
+                # If for some reason REAL_LOCATION is unavailable, it uses FAKE_LOCATION (creating random data)
+                if not location or location == 'YOUR_REAL_LOCATION':
+                    location = getattr(settings, 'FAKE_LOCATION', 'Rome')
+                
                 url = f"https://wttr.in/{urllib.parse.quote(location)}?format=j1"
                 
                 req = urllib.request.Request(url, headers={'User-Agent': 'PipBoy-Terminal'})

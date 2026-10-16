@@ -8,13 +8,74 @@ from threading import Lock, Thread
 import requests
 import pygame
 import settings
+import urllib.request
 from typing import Tuple, List, Dict, Optional
 from pygame.math import Vector2
 from PIL import Image
 from util_functs import Utils
 
-
-
+def update_and_save_position():
+    """Interroga l'IP tramite Geoapify e aggiorna persistentemente settings_secrets.py."""
+    api_key = getattr(settings, 'GEOAPIFY_API_KEY', '') or getattr(settings, 'GEOAPIFY_KEY', '')
+    if not api_key or api_key == 'YOUR_GEOAPIFY_KEY':
+        return False
+        
+    try:
+        url = f"https://api.geoapify.com/v1/ipinfo?apiKey={api_key}"
+        req = urllib.request.Request(url, headers={'User-Agent': 'PipBoy-Terminal'})
+        with urllib.request.urlopen(req, timeout=5) as response:
+            data = json.loads(response.read().decode())
+            loc = data.get('location', {})
+            lat = loc.get('latitude')
+            lon = loc.get('longitude')
+            city = data.get('city', {}).get('name', None)
+            
+            if lat and lon:
+                current_lat = getattr(settings, 'LATITUDE', 0.0)
+                current_lon = getattr(settings, 'LONGITUDE', 0.0)
+                
+                # Esegue la scrittura solo se c'è un effettivo cambiamento di posizione
+                if abs(current_lat - lat) > 0.0001 or abs(current_lon - lon) > 0.0001:
+                    settings.LATITUDE = lat
+                    settings.LONGITUDE = lon
+                    
+                    secrets_path = os.path.join(settings.BASE_DIR, 'settings_secrets.py')
+                    if os.path.exists(secrets_path):
+                        with open(secrets_path, 'r', encoding='utf-8') as f:
+                            lines = f.readlines()
+                            
+                        new_lines = []
+                        lat_written, lon_written, loc_written = False, False, False
+                        
+                        for line in lines:
+                            stripped = line.strip()
+                            if stripped.startswith('LATITUDE'):
+                                new_lines.append(f"LATITUDE = {lat}\n")
+                                lat_written = True
+                            elif stripped.startswith('LONGITUDE'):
+                                new_lines.append(f"LONGITUDE = {lon}\n")
+                                lon_written = True
+                            elif city and stripped.startswith('REAL_LOCATION'):
+                                new_lines.append(f"REAL_LOCATION = '{city}'\n")
+                                loc_written = True
+                            else:
+                                new_lines.append(line)
+                                
+                        if not lat_written:
+                            new_lines.append(f"LATITUDE = {lat}\n")
+                        if not lon_written:
+                            new_lines.append(f"LONGITUDE = {lon}\n")
+                        if city and not loc_written:
+                            new_lines.append(f"REAL_LOCATION = '{city}'\n")
+                            
+                        with open(secrets_path, 'w', encoding='utf-8') as f:
+                            f.writelines(new_lines)
+                            
+                        print(f"[Geo] Posizione aggiornata e salvata in settings_secrets.py: {city} ({lat}, {lon})")
+                    return True
+    except Exception as e:
+        print(f"[Geo IP Error]: {e}")
+    return False
 
 class BaseMap:
     def __init__(self, screen: pygame.Surface, draw_space: pygame.Rect, 
@@ -143,22 +204,20 @@ class WorldMap(BaseMap):
 class RealMap(BaseMap):
     """Dynamic real-world map using Geoapify API."""    
 
-    def __init__(self, screen: pygame.Surface, draw_space: pygame.Rect, 
-                 api_zoom: int = 13):
+    def __init__(self, screen: pygame.Surface, draw_space: pygame.Rect, api_zoom: int = 13):
         
         self.screen = screen
+        update_and_save_position()
         self.lat, self.lon = settings.LATITUDE, settings.LONGITUDE
         self.api_zoom = api_zoom
         self.draw_space = draw_space
-        
-        # Loads icons if the folder exists
+    
         if hasattr(settings, 'MAP_ICONS_BASE_FOLDER') and os.path.exists(settings.MAP_ICONS_BASE_FOLDER):
             self.icons = Utils.load_svgs_dict(settings.MAP_ICONS_BASE_FOLDER, settings.MAP_ICON_SIZE)
         else:
             self.icons = {}
 
         self.failed_connection = False
-
         self._cache_lock = Lock()
         self._places_cache_lock = Lock()
         self.rendered_map_lock = Lock()
@@ -204,20 +263,19 @@ class RealMap(BaseMap):
         return pygame.image.fromstring(inv_rgba.tobytes(), inv_rgba.size, 'RGBA')
 
     def _fetch_map_image(self) -> pygame.Surface:
-        """Retrieve map image with caching."""
+        """Retrieve map image with caching and automatic cleanup of old maps."""
         os.makedirs(settings.MAP_CACHE, exist_ok=True)
         filename = f"{self.lat:.6f}_{self.lon:.6f}_{self.api_zoom}_{settings.MAP_SIZE}.png"
         cache_path = os.path.join(settings.MAP_CACHE, filename)
 
-        # If image is in the cache
+        # If the image is already in the cache it loads it automatically
         if os.path.exists(cache_path):
             map_img = pygame.image.load(cache_path).convert_alpha()
             self.failed_connection = False
-            # Inverts colors and applies the Pip-Boy selected color theme
             map_img_inverted = self._invert_surface(map_img)
             return Utils.tint_image(map_img_inverted)
 
-        # Building of the Geoapify URL
+        # Building of URL for static map
         api_key = getattr(settings, 'GEOAPIFY_API_KEY', '') or getattr(settings, 'GEOAPIFY_KEY', '')
         url = (
             f"https://maps.geoapify.com/v1/staticmap"
@@ -232,13 +290,22 @@ class RealMap(BaseMap):
             response = requests.get(url, timeout=10)
             response.raise_for_status()
             
+            # Cleans Cache folder to make space for new map
+            if os.path.exists(settings.MAP_CACHE):
+                for cached_file in os.listdir(settings.MAP_CACHE):
+                    if cached_file.endswith('.png') and cached_file != filename:
+                        try:
+                            os.remove(os.path.join(settings.MAP_CACHE, cached_file))
+                        except Exception:
+                            pass
+
+            # Save New Map
             with open(cache_path, "wb") as f:
                 f.write(response.content)
 
             map_img = pygame.image.load(io.BytesIO(response.content)).convert_alpha()
             self.failed_connection = False
             
-            # Inverts colors and applies the Pip-Boy selected color theme
             map_img_inverted = self._invert_surface(map_img)
             return Utils.tint_image(map_img_inverted)
             
