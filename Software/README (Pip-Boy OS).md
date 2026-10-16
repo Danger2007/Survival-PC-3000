@@ -45,4 +45,4 @@ The Pip-Boy OS uses for input:
 ## Important information
 - **This version might not work on the SPC 3000**: As I don't currently have the hardware, I cannot check;
 - **Not everything from the games is in the code**: I don't have enough time to insert all missions/notes/weaons etc... so for the Stardance event I'll just leave some elements from the games and some fallback Images to ease future additions;
-- **There is NO Firmware**: To interface with the hardware correctly, I've made a file called [hardware_inputs](./Software/Pip-Boy%20OS/modules/hardware_input.py) directly in the software that trasforms inputs form the GPIO port into Pygame buttons (for example: whell scroll == UP/DOWN KEY).
+- **There is NO Firmware**: To interface with the hardware correctly, I've made a file called [hardware_inputs](./Pip-Boy%20OS/modules/hardware_input.py) directly in the software that trasforms inputs form the GPIO port into Pygame buttons (for example: whell scroll == UP/DOWN KEY).
