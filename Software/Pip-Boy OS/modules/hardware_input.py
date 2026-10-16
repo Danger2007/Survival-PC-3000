@@ -18,7 +18,7 @@ class TEA5767Radio:
             try:
                 self.bus = smbus.SMBus(self.bus_number)
             except Exception as e:
-                print(f"[Hardware Error] Impossibile aprire il bus I2C per la radio FM: {e}")
+                print(f"[Hardware Error] Reading of I2C for FM Radio module failed: {e}")
 
     def set_frequency(self, frequency_mhz):
         if not self.bus:
@@ -34,7 +34,7 @@ class TEA5767Radio:
             ]
             self.bus.write_i2c_block_data(self.address, buffer[0], buffer[1:])
         except Exception as e:
-            print(f"[FM Radio Error] Errore di sintonizzazione: {e}")
+            print(f"[FM Radio Error] Syncronization error: {e}")
 
 
 class HardwareInputManager:
@@ -47,27 +47,27 @@ class HardwareInputManager:
         self.is_nv = ui_style in ('fallout_nv', 'fallout_new_vegas')
 
         if not getattr(settings, 'RASPI', False) or not GPIO_AVAILABLE:
-            print("[Hardware] Modalità Raspberry Pi disattivata o GPIO non disponibili. Uso simulato.")
+            print("[Hardware] Raspberry not detected/GPIO deactivated\nSimulated Inputs: ON")
             return
 
         try:
-            # 1. I 3 PULSANTI PRINCIPALI (S1, S2, S3)
+            # 1. THE 3 MAIN BUTTONS
             self.btn_s1 = Button(17, pull_up=True, bounce_time=0.05)
             self.btn_s2 = Button(27, pull_up=True, bounce_time=0.05)
             self.btn_s3 = Button(22, pull_up=True, bounce_time=0.05)
 
             if self.is_nv:
-                # New Vegas: S1 = STATS (0), S3 = ITEMS/INV (1), S2 = DATA (2)
+                # New Vegas UI: S1 = STATS (0), S3 = ITEMS/INV (1), S2 = DATA (2)
                 self.btn_s1.when_pressed = lambda: self._handle_nv_button(0)
                 self.btn_s3.when_pressed = lambda: self._handle_nv_button(1)
                 self.btn_s2.when_pressed = lambda: self._handle_nv_button(2)
             else:
-                # Fallout 4 standard
+                # Fallout 4: S1 = LEFT KEY, S3 = RETURN, S2 = RIGHT KEY
                 self.btn_s1.when_pressed = lambda: self._inject_key(pygame.K_LEFT)
                 self.btn_s2.when_pressed = lambda: self._inject_key(pygame.K_RIGHT)
                 self.btn_s3.when_pressed = lambda: self._inject_key(pygame.K_RETURN)
 
-            # 2. ROTELLINA (ROTARY SWITCH) -> SCROLL VERTICALE
+            # 2. SCROLL WHEEL (ROTARY SWITCH) -> UP/DOWN KEY
             self.encoder = RotaryEncoder(a=5, b=6, wrap=False, max_steps=100)
             self.wheel_btn = Button(13, pull_up=True, bounce_time=0.05)
             self.wheel_btn.when_pressed = lambda: self._inject_key(pygame.K_x)
@@ -76,7 +76,7 @@ class HardwareInputManager:
             self.running_wheel = True
             threading.Thread(target=self._monitor_encoder, daemon=True).start()
 
-            # 3. MANOPOLA ROTATIVA 1P5T (ROT1) -> CAMBIO SUB-TAB
+            # 3. KNOB 1P5T (ROT1) -> CHANGE SUB-TAB
             self.rot1_pins = [19, 26, 20, 21, 16]
             self.rot1_devices = [DigitalInputDevice(pin, pull_up=True) for pin in self.rot1_pins]
             
@@ -90,22 +90,22 @@ class HardwareInputManager:
             # 5. MODULO RTC (DS3231)
             self._verify_rtc_sync()
 
-            print("[Hardware] Configurazione input hardware completata per New Vegas / F4.")
+            print("[Hardware] Input configuration complete.")
         except Exception as e:
-            print(f"[Hardware Error] Errore nell'inizializzazione dei pin GPIO: {e}")
+            print(f"[Hardware Error] Error in GPIO inizialization: {e}")
 
     def _handle_nv_button(self, target_tab_index):
-        """Gestisce la selezione diretta del tab o l'azione se ci si trova già nel tab."""
+        """In NV UI, pressing / holding the button of the open Menu will be interpreted as RETURN / X"""
         if not self.tab_manager:
             return
 
         current_index = getattr(self.tab_manager, 'current_tab_index', 0)
         
         if current_index == target_tab_index:
-            # Se siamo già nel tab, invia RETURN per selezionare l'elemento
+            # If we are in the related tab use RETURN
             self._inject_key(pygame.K_RETURN)
         else:
-            # Se siamo altrove, salta direttamente al tab corrispondente
+            # If we aren't in the related menu, change menu
             if hasattr(self.tab_manager, 'navigate'):
                 self.tab_manager.navigate(target_tab_index)
             else:
