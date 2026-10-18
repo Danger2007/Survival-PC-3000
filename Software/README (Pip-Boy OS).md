@@ -4,6 +4,7 @@ The Pip-Boy OS (or Pip-Boy Operating System) is the 'soul' of the SPC 3000.
 This is my first ever Python code, so I used a [half made base](https://github.com/kelmes1/pipboy-pi) that I found online; I also used Gemini as a support in the making of the code, so as to understand Python faster and to speed up the programming process, however that doesn't mean that the code is AI slop, I came up with the logic and the AI just transcribed the logic in Python.
 
 ![Prenentation NV Gif](./Pip-Boy%20OS/documentation/screenshots/Record.gif)
+![Prenentation NV Gif](./Pip-Boy%20OS/documentation/screenshots/RecordFO4.gif)
 
 ## First Run Preparations And Requirements
 All the software requirements are listed in the [requirements file](./Pip-Boy%20OS/requirements.txt)
