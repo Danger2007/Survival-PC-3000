@@ -70,7 +70,7 @@
 
 -**Songs:** they are taken from the [Internet Archive](https://archive.org/search?query=78+rpm+records&tab=all ) and are all 78 rpm songs from 1930s/1940s that are in the public domain
 
--**SFXs:** they are from the original Pip-Boy menu
+-**SFXs:** inherited from the base open-source repository (I don't know the origin of those SFXs; can be removed/replaced if required)
 
 ### Instruments:
 
