@@ -21,7 +21,7 @@ To start the code you need to run [main.py](./Pip-Boy%20OS/modules/main.py), run
 ![alt text](./Pip-Boy%20OS/documentation/screenshots/image-1.png)
 
 ## Customization
-The Pip-Boy OS that you can find in the repo can also be personalized using the [configure.py](./Pip-Boy%20OS/configure.py) file. To move in the configure.py UI you use as inputs:
+The Pip-Boy OS that you can find in the repo can also be personalized using the [configure.py](./Pip-Boy%20OS/configure.py) file or by using the settings tab in the running code (the position of the tab changes: in FO4 UI it's located in the DATA Menu, in the FNV UI it's a subtab of the General Tab in STATS). To move in the configure.py UI you use as inputs:
 - **Numpad 2**: to move down
 - **Numpad 8**: to move up
 - **ENTER**: To change/select an option
