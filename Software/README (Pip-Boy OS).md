@@ -21,13 +21,25 @@ To start the code you need to run [main.py](./Pip-Boy%20OS/modules/main.py), run
 ![alt text](./Pip-Boy%20OS/documentation/screenshots/image-1.png)
 
 ## Customization
-The Pip-Boy OS that you can find in the repo can also be personalized using the [configure.py](./Pip-Boy%20OS/configure.py) file or by using the settings tab in the running code (the position of the tab changes: in FO4 UI it's located in the DATA Menu, in the FNV UI it's a subtab of the General Tab in STATS). To move in the configure.py UI you use as inputs:
+The Pip-Boy OS that you can find in the repo can also be personalized using the [configure.py](./Pip-Boy%20OS/configure.py) file or by using the **settings tab in the running code** (the position of the tab changes: in FO4 UI it's located in the DATA Menu, in the FNV UI it's a subtab of the General Tab in STATS). To move in the configure.py UI you use as inputs:
 - **Numpad 2**: to move down
 - **Numpad 8**: to move up
 - **ENTER**: To change/select an option
+### PARTS NOT MINE:
+
+-**3d Model of the casing:** I used [This 3D Pip-Boy case](https://ytec3d.com/pip-boy/) as a base and then heavily modified it to make space for the hardwware
+
+-**Pip-Boy menu:** I used [This Pip-Boy menu on github](https://github.com/kelmes1/pipboy-pi/tree/main) as a base to develop my code (the code has suffered extreme changes, only a few files remained unchanged)
+
+-**Icons:** they are taken from the [Iconify archive](https://icon-sets.iconify.design/ ) and all have MIT or Apache 2.0 licensing (No attribution required, commercial use is allowed)
+
+-**Songs:** they are taken from the [Internet Archive](https://archive.org/search?query=78+rpm+records&tab=all ) and are all 78 rpm songs from 1930s/1940s that are in the public domain
+
+-**SFXs:** inherited from the base open-source repository (I don't know the origin of those SFXs; can be removed/replaced if required)
 
 (Always make sure that the Numlock is **ON**)
 ![alt text](./Pip-Boy%20OS/documentation/screenshots/image.png)
+
 ## Inputs
 The Pip-Boy OS uses for input:
 - **Left Arrow**: to move to the menu to the left
