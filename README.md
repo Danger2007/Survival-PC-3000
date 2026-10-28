@@ -21,9 +21,12 @@ The device runs a **Raspberry Pi OS (Legacy 32-bit with Desktop)** on a Raspberr
 
 <img width="397" height="316" alt="Screenshot 2026-08-27 130842" src="https://github.com/user-attachments/assets/0c52e5ed-df51-482c-84d8-b31679faa2be" />
 
+## AI Disclaimer
+I used Gemini to transcribe human logic to Python code, this is to maximise library use, code optimization and time efficiency. I also did some direct modifications to the code (to fix some errors)
+
 ### PARTS NOT MINE:
 
--**3d Model of the casing:** I used [This 3D Pip-Boy case](https://ytec3d.com/pip-boy/) as a base and then heavily modified it to make space for the hardwware
+-**3d Model of the casing:** I used [This 3D Pip-Boy case](https://ytec3d.com/pip-boy/) as a base and then **heavily modified** it to make space for the hardwware (I added back compartment/space for srews/stretched all front parts)
 
 -**Pip-Boy menu:** I used [This Pip-Boy menu on github](https://github.com/kelmes1/pipboy-pi/tree/main) as a base to develop my code (the code has suffered extreme changes, only a few files remained unchanged)
 
