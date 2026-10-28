@@ -25,6 +25,10 @@ The Pip-Boy OS that you can find in the repo can also be personalized using the 
 - **Numpad 2**: to move down
 - **Numpad 8**: to move up
 - **ENTER**: To change/select an option
+
+(Always make sure that the Numlock is **ON**)
+![alt text](./Pip-Boy%20OS/documentation/screenshots/image.png)
+
 ### PARTS NOT MINE:
 
 -**3d Model of the casing:** I used [This 3D Pip-Boy case](https://ytec3d.com/pip-boy/) as a base and then heavily modified it to make space for the hardwware
@@ -36,9 +40,6 @@ The Pip-Boy OS that you can find in the repo can also be personalized using the 
 -**Songs:** they are taken from the [Internet Archive](https://archive.org/search?query=78+rpm+records&tab=all ) and are all 78 rpm songs from 1930s/1940s that are in the public domain
 
 -**SFXs:** inherited from the base open-source repository (I don't know the origin of those SFXs; can be removed/replaced if required)
-
-(Always make sure that the Numlock is **ON**)
-![alt text](./Pip-Boy%20OS/documentation/screenshots/image.png)
 
 ## Inputs
 The Pip-Boy OS uses for input:
