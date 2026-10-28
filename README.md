@@ -21,6 +21,21 @@ The device runs a **Raspberry Pi OS (Legacy 32-bit with Desktop)** on a Raspberr
 
 <img width="397" height="316" alt="Screenshot 2026-08-27 130842" src="https://github.com/user-attachments/assets/0c52e5ed-df51-482c-84d8-b31679faa2be" />
 
+## AI Disclaimer
+I used Gemini to transcribe human logic to Python code, this is to maximise library use, code optimization and time efficiency. I also did some direct modifications to the code (to fix some errors)
+
+### PARTS NOT MINE:
+
+-**3d Model of the casing:** I used [This 3D Pip-Boy case](https://ytec3d.com/pip-boy/) as a base and then **heavily modified** it to make space for the hardwware (I added back compartment/space for srews/stretched all front parts)
+
+-**Pip-Boy menu:** I used [This Pip-Boy menu on github](https://github.com/kelmes1/pipboy-pi/tree/main) as a base to develop my code (the code has suffered extreme changes, only a few files remained unchanged)
+
+-**Icons:** they are taken from the [Iconify archive](https://icon-sets.iconify.design/ ) and all have MIT or Apache 2.0 licensing (No attribution required, commercial use is allowed)
+
+-**Songs:** they are taken from the [Internet Archive](https://archive.org/search?query=78+rpm+records&tab=all ) and are all 78 rpm songs from 1930s/1940s that are in the public domain
+
+-**SFXs:** inherited from the base open-source repository (I don't know the origin of those SFXs; can be removed/replaced if required)
+
 ## Important Information (For the SPC 3000, for the Pip-Boy OS [click here](Software/README%20(Pip-Boy%20OS).md))
 1) **In this repo there aren't any Images and sfxs**: As I'm european and european laws are a hassle and a half, I've decided to not insert any images or sfxs that could've broken the [Bethesda Copyright Policies](https://documents.bethesda.net/en/legal-information). I know, this will cost me dearly stardust-wise, but I'd rather be a bitch about it than lose the project.
 2) **There is NO FIRMWARE**: the project uses a raspberry and, because I'm not using custom PCBs, it doesn't need a firmware. The only thing near to a firmware is the [hardware_inputs](./Software/Pip-Boy%20OS/modules/hardware_input.py ) file, which links the inputs from the GPIO ports of the Raspberry to their repsective PC Button/s (example: knob == A/D key);
