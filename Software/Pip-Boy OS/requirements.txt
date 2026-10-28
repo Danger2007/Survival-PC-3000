@@ -1,6 +1,10 @@
-python==3.12
-numpy==2.2.2
-Pillow==11.1.0
-pygame_ce==2.5.5
-Requests==2.32.3
-tinytag==1.10.1
+# python==3.12
+numpy>=2.0.0
+Pillow>=11.0.0
+pygame_ce>=2.5.0
+Requests>=2.30.0
+tinytag>=1.10.0
+
+# Optional Hardware dependencies for Linux / Raspberry
+smbus2>=0.4.2; sys_platform != 'win32'
+gpiozero>=1.6.2; sys_platform != 'win32'

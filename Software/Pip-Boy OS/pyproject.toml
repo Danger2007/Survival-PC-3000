@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pipboy-os"
+version = "1.0.0"
+description = "Pip-Boy OS - The ultimate Fallout interface built with Python and Pygame."
+readme = "README.md"
+authors = [{ name = "DanieleM" }]
+license = "MIT" 
+dependencies = [
+    "numpy>=2.0.0",
+    "Pillow>=11.0.0",
+    "pygame-ce>=2.5.5",
+    "Requests>=2.32.3",
+    "tinytag>=1.10.1",
+    "smbus2>=0.4.2; sys_platform != 'win32'",
+    "gpiozero>=1.6.2; sys_platform != 'win32'"
+]
+
+[project.scripts]
+pipboy-os = "pip_boy_os.modules.main:main"
+
+[tool.setuptools.packages.find]
+where = ["pip_boy_os"]
+
+[tool.setuptools.package-data]
+"*" = ["*.ini", "fonts/*", "images/**/*", "sounds/*"]

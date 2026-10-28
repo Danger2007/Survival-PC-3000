@@ -1,6 +1,7 @@
 # Main entry point for the Pip-Boy application.
 import os
 import sys
+sys.path.insert(0, os.path.dirname(__file__))
 import subprocess
 import pygame
 import settings

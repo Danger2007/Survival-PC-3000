@@ -1,0 +1,2 @@
+[console_scripts]
+pipboy-os = pip_boy_os.modules.main:main
