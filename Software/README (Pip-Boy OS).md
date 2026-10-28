@@ -1,13 +1,25 @@
 # Pip-Boy OS
 
 The Pip-Boy OS (or Pip-Boy Operating System) is the 'soul' of the SPC 3000. 
-This is my first ever Python code, so I used a [half made base](https://github.com/kelmes1/pipboy-pi) that I found online; I also used Gemini as a support in the making of the code, so as to understand Python faster and to speed up the programming process, however that doesn't mean that the code is AI slop, I came up with the logic and the AI just transcribed the logic in Python.
+This is my first ever Python code, so I used a [half made base](https://github.com/kelmes1/pipboy-pi) that I found online;
+
 
 ![Prenentation NV Gif](./Pip-Boy%20OS/documentation/screenshots/Record.gif)
 ![Prenentation NV Gif](./Pip-Boy%20OS/documentation/screenshots/RecordFO4.gif)
 
-## First Run Preparations And Requirements
+## AI Disclaimer
+I used Gemini to transcribe human logic to Python code, this is to maximise library use, code optimization and time efficiency. I also did some direct modifications to the code (to fix some errors)
+
+## 🚀 Quick Start
+
 All the software requirements are listed in the [requirements file](./Pip-Boy%20OS/requirements.txt)
+You can Install Pip-Boy OS from PyPI:
+
+        ```bash
+        pip install pipboy-os
+        python -m pip_boy_os.modules.main
+        
+## First Run Preparations And Requirements
 Before running the Pip-Boy OS for the first time you'll need to run the file **init** (init.bash if you are using windows; init.sh if you're using linux) these files create various vital files and folders in the Pip-Boy OS (it generates the '**cache**' folder and the '**settings_secret**' file). **In case init doesn't compile/run**: you have to manually add the cache folder with inside 2 folders named '**map**' and '**places**' and you have to add a Python file inside **modules** called '**settings_secret**' with these lines of code.
 
         REAL_LOCATION = 'YOUR_LOCATION'
