@@ -8,7 +8,7 @@ This is my first ever Python code, so I used a [half made base](https://github.c
 ![Prenentation NV Gif](./Pip-Boy%20OS/documentation/screenshots/RecordFO4.gif)
 
 ## AI Disclaimer
-I used Gemini to transcribe human logic to Python code, this is to maximise library use, code optimization and time efficiency. I also did some direct modifications to the code (to fix some errors)
+I used Gemini to transcribe human logic to Python code, this is to maximise library use, code optimization and time efficiency (while still learning how those comands work). I also did some direct modifications to the code (to fix some errors)
 
 ## 🚀 Quick Start
 
@@ -19,8 +19,8 @@ You can Install Pip-Boy OS from PyPI:
         pip install pipboy-os
         python -m pip_boy_os.modules.main
         
-## First Run Preparations And Requirements
-Before running the Pip-Boy OS for the first time you'll need to run the file **init** (init.bash if you are using windows; init.sh if you're using linux) these files create various vital files and folders in the Pip-Boy OS (it generates the '**cache**' folder and the '**settings_secret**' file). **In case init doesn't compile/run**: you have to manually add the cache folder with inside 2 folders named '**map**' and '**places**' and you have to add a Python file inside **modules** called '**settings_secret**' with these lines of code.
+## Preparations for Running the sourcecode
+If you install the soource code before running the Pip-Boy OS for the first time locally you'll need to run the file **init** (init.bash if you are using windows; init.sh if you're using linux) these files create various vital files and folders in the Pip-Boy OS (it generates the '**cache**' folder and the '**settings_secret**' file). **In case init doesn't compile/run**: you have to manually add the cache folder with inside 2 folders named '**map**' and '**places**' and you have to add a Python file inside **modules** called '**settings_secret**' with these lines of code.
 
         REAL_LOCATION = 'YOUR_LOCATION'
         LONGITUDE = 00.0000
