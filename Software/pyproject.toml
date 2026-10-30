@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pipboy-os"
-version = "1.0.1"
+version = "1.0.2"
 description = "Pip-Boy OS - A Double Fallout interface built with Python and Pygame."
 readme = "README (Pip-Boy OS).md"
 authors = [{ name = "DanieleM" }]
