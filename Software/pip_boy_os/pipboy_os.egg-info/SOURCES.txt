@@ -1,3 +1,4 @@
+README (Pip-Boy OS).md
 pyproject.toml
 pip_boy_os/images/stats/body/legs1/head_positions.ini
 pip_boy_os/images/stats/special/charisma/frameorder.ini

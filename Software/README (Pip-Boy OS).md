@@ -4,15 +4,15 @@ The Pip-Boy OS (or Pip-Boy Operating System) is the 'soul' of the SPC 3000.
 This is my first ever Python code, so I used a [half made base](https://github.com/kelmes1/pipboy-pi) that I found online;
 
 
-![Prenentation NV Gif](./Pip-Boy%20OS/documentation/screenshots/Record.gif)
-![Prenentation NV Gif](./Pip-Boy%20OS/documentation/screenshots/RecordFO4.gif)
+![Prenentation NV Gif](./documentation/screenshots/Record.gif)
+![Prenentation NV Gif](./documentation/screenshots/RecordFO4.gif)
 
 ## AI Disclaimer
 I used Gemini to transcribe human logic to Python code, this is to maximise library use, code optimization and time efficiency. I also did some direct modifications to the code (to fix some errors)
 
 ## 🚀 Quick Start
 
-All the software requirements are listed in the [requirements file](./Pip-Boy%20OS/requirements.txt)
+All the software requirements are listed in the [requirements file](./requirements.txt)
 You can Install Pip-Boy OS from PyPI:
 
         ```bash
@@ -29,17 +29,17 @@ Before running the Pip-Boy OS for the first time you'll need to run the file **i
  
 REMEMBER: if you want to see the IRL Map you need to insert in the code above your information (doesn't need to be true) and Create/Insert your Geoapify API Key (at https://www.geoapify.com/get-started-with-maps-api/ in the "Project and API Keys" section); DO NOT insert the URL (it doesn't work).
 ## How To Run
-To start the code you need to run [main.py](./Pip-Boy%20OS/modules/main.py), running other codes inside the software will not work. The code works perfectly on PC, give it a try!
-![alt text](./Pip-Boy%20OS/documentation/screenshots/image-1.png)
+To start the code you need to run [main.py](./pip_boy_os/modules/main.py), running other codes inside the software will not work. The code works perfectly on PC, give it a try!
+![alt text](./documentation/screenshots/image-1.png)
 
 ## Customization
-The Pip-Boy OS that you can find in the repo can also be personalized using the [configure.py](./Pip-Boy%20OS/configure.py) file or by using the **settings tab in the running code** (the position of the tab changes: in FO4 UI it's located in the DATA Menu, in the FNV UI it's a subtab of the General Tab in STATS). To move in the configure.py UI you use as inputs:
+The Pip-Boy OS that you can find in the repo can also be personalized using the [configure.py](./configure.py) file or by using the **settings tab in the running code** (the position of the tab changes: in FO4 UI it's located in the DATA Menu, in the FNV UI it's a subtab of the General Tab in STATS). To move in the configure.py UI you use as inputs:
 - **Numpad 2**: to move down
 - **Numpad 8**: to move up
 - **ENTER**: To change/select an option
 
 (Always make sure that the Numlock is **ON**)
-![alt text](./Pip-Boy%20OS/documentation/screenshots/image.png)
+![alt text](./documentation/screenshots/image.png)
 
 ### PARTS NOT MINE:
 

@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pipboy-os"
-version = "1.0.0"
-description = "Pip-Boy OS - The ultimate Fallout interface built with Python and Pygame."
-readme = "README.md"
+version = "1.0.1"
+description = "Pip-Boy OS - A Double Fallout interface built with Python and Pygame."
+readme = "README (Pip-Boy OS).md"
 authors = [{ name = "DanieleM" }]
 license = "MIT" 
 dependencies = [

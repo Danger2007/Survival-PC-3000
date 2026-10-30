@@ -1,4 +1,3 @@
-cache
 fonts
 images
 modules
