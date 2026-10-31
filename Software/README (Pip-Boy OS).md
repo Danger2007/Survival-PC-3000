@@ -47,13 +47,18 @@ The Pip-Boy OS that you can find in the repo can also be personalized using the 
 
 -**3d Model of the casing:** I used [This 3D Pip-Boy case](https://ytec3d.com/pip-boy/) as a base and then heavily modified it to make space for the hardwware
 
--**Pip-Boy menu:** I used [This Pip-Boy menu on github](https://github.com/kelmes1/pipboy-pi/tree/main) as a base to develop my code (the code has suffered extreme changes, only a few files remained unchanged)
+-**Pip-Boy menu:** I used [This Pip-Boy menu on github](https://github.com/kelmes1/pipboy-pi/tree/main) made by Kelmes1 as a base to develop my code (the code has suffered extreme changes, only a few files remained unchanged)
 
--**Icons:** they are taken from the [Iconify archive](https://icon-sets.iconify.design/ ) and all have MIT or Apache 2.0 licensing (No attribution required, commercial use is allowed)
+-**Clock Icons:** they are taken from the [Iconify archive](https://icon-sets.iconify.design/ ) and all have MIT or Apache 2.0 licensing (No attribution required, commercial use is allowed)
 
 -**Songs:** they are taken from the [Internet Archive](https://archive.org/search?query=78+rpm+records&tab=all ) and are all 78 rpm songs from 1930s/1940s that are in the public domain
 
--**SFXs:** inherited from the base open-source repository (I don't know the origin of those SFXs; can be removed/replaced if required)
+-**SFXs:** inherited from the base open-source repository of Kelmes1 (I don't know the origin of those SFXs; can be removed/replaced if required)
+
+-**Images/Icons/2d Animations:** most images/icons/animations of the Fallout 4 UI are inherited from Kelmes1's repo (there are a few exceptions, like the [fatman animation](https://sketchfab.com/3d-models/fatman-m45-65bf0e5a4c304ca091d8dfa6a3a4fa8d) that I downloaded from sketchfab or the food icon that I downloaded from iconify). Almost all images from the Fallout New Vegas UI are from [The Fallout Fandom Wiki](https://fallout.fandom.com/wiki/Fallout_Wiki) (the only exception are the pipboy parts from the CND tab, which I acquired by cropping various online images of the original tab)
+
+## Legal Notice:
+This Pip-Boy OS is a non-commercial, fan-made software interface inspired by the Fallout universe (Bethesda Softworks). The core software base is inherited from Kelmes1's open-source repository under the MIT License. All official visual assets, iconography, and game elements remain the property of their respective copyright holders (Bethesda Softworks / Microsoft). This repository is published strictly for educational, portfolio, and personal maker purposes with no intent for commercial gain or copyright infringement. If you need more info I left a [LICENSE file](https://github.com/Danger2007/Survival-PC-3000/blob/main/LICENSE).
 
 ## Inputs
 The Pip-Boy OS uses for input:
