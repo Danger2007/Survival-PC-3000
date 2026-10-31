@@ -1,16 +1,11 @@
-<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 598 842" width="598" height="842">
-	<style>
-		tspan { white-space:pre } 
-		.t0 { font-size: 87px;fill: #ffffff;font-weight: 400;font-family: "DejaVuSans", "DejaVu Sans" } 
-	</style>
-	<g id="Layer 1">
-		<text id="Placeholder     (sorry)         " style="transform: matrix(1.125,0,0,1.125,13,387.45)">
-			<tspan x="0" y="0" class="t0">P</tspan><tspan  y="0" class="t0">l</tspan><tspan  y="0" class="t0">a</tspan><tspan  y="0" class="t0">c</tspan><tspan  y="0" class="t0">e</tspan><tspan  y="0" class="t0">h</tspan><tspan  y="0" class="t0">o</tspan><tspan  y="0" class="t0">l</tspan><tspan  y="0" class="t0">d</tspan><tspan  y="0" class="t0">e</tspan><tspan  y="0" class="t0">r</tspan><tspan  y="0" class="t0">
-</tspan>
-			<tspan x="0" y="104.4" class="t0"> </tspan><tspan  y="104.4" class="t0"> </tspan><tspan  y="104.4" class="t0"> </tspan><tspan  y="104.4" class="t0"> </tspan><tspan  y="104.4" class="t0">(</tspan><tspan  y="104.4" class="t0">s</tspan><tspan  y="104.4" class="t0">o</tspan><tspan  y="104.4" class="t0">r</tspan><tspan  y="104.4" class="t0">r</tspan><tspan  y="104.4" class="t0">y</tspan><tspan  y="104.4" class="t0">)</tspan><tspan  y="104.4" class="t0">
-</tspan>
-			<tspan x="0" y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0"> </tspan><tspan  y="208.8" class="t0">:</tspan><tspan  y="208.8" class="t0">(</tspan><tspan  y="208.8" class="t0">
-</tspan>
-		</text>
-	</g>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 25.4.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 26 26" style="enable-background:new 0 0 26 26;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;}
+	.st1{fill-rule:evenodd;clip-rule:evenodd;fill:#FFFFFF;}
+</style>
+<rect class="st0" width="26" height="26"/>
+<path class="st1" d="M22.1,13.5L13,4.2l-9.1,9.3H0.3L13,0.5l12.7,13H22.1 M0.3,25.5l12.7-13l12.7,13h-3.5L13,16.2l-9.1,9.3H0.3"/>
 </svg>
