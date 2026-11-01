@@ -1,5 +1,0 @@
-fonts
-images
-modules
-objs
-sounds

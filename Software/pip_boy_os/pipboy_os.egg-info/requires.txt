@@ -1,9 +1,0 @@
-numpy>=2.0.0
-Pillow>=11.0.0
-pygame-ce>=2.5.5
-Requests>=2.32.3
-tinytag>=1.10.1
-
-[:sys_platform != "win32"]
-smbus2>=0.4.2
-gpiozero>=1.6.2
