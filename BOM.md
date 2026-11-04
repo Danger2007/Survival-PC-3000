@@ -56,7 +56,7 @@
 
 -It doubles as an alarm clock
 
--It runs a raspberry Pi OS (legacy 32-bit with desktop) with my OS [(Pip-Boy OS)](https://stardance.hackclub.com/projects/35444)
+-It runs a raspberry Pi OS (legacy 32-bit with desktop) and my recreation of the Pip-Boy UI [(Pip-Boy OS)](https://stardance.hackclub.com/projects/35444)
 
 ### PARTS NOT MINE:
 
