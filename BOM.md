@@ -64,15 +64,7 @@
 
 -**3d Model of the casing:** I used [This 3D Pip-Boy case](https://ytec3d.com/pip-boy/) as a base and then heavily modified it to make space for the hardwware
 
--**Pip-Boy menu:** I used [This Pip-Boy menu on github](https://github.com/kelmes1/pipboy-pi/tree/main) as a base to develop my code (the code has suffered extreme changes, only a few files remained unchanged)
-
--**Icons:** they are taken from the [Iconify archive](https://icon-sets.iconify.design/ ) and all have MIT or Apache 2.0 licensing (No attribution required, commercial use is allowed)
-
--**Songs:** they are taken from the [Internet Archive](https://archive.org/search?query=78+rpm+records&tab=all ) and are all 78 rpm songs from 1930s/1940s that are in the public domain
-
--**SFXs:** inherited from the base open-source repository (I don't know the origin of those SFXs; can be removed/replaced if required)
-
-### Instruments:
+### Tools needed:
 
 -[Link](https://www.temu.com/it/saldatura--versione-aggiornata-con-interruttore-e--regolabile-set-di-5-pezzi-di-testa-di-saldatura-telaio-di-saldatura-con-borsa-in-pu-g-606487028013717.html?_oak_mp_inf=EJW19p6M84kBGh1nb29kc195OGJpNTRfc29sZF9vdXRfc2ltaWxhciDokKK36TM%253D&top_gallery_url=https%253A%252F%252Fimg.kwcdn.com%252Fproduct%252Falgo_framework%252FImageCm2InAlgo%252F4015d47e-d670-11f0-820a-0a580aad1a5a.jpg&spec_gallery_id=606487028013717&refer_page_sn=10032&freesia_scene=25&_oak_freesia_scene=25&_oak_rec_ext_1=MTc0Mw&_oak_gallery_order=1872583540%252C837633626%252C2057119976%252C1486352826%252C947709777&refer_page_el_sn=200970&_x_vst_scene=adg&_x_ads_sub_channel=shopping&_x_ns_prz_type=-1&_x_ns_sku_id=95906888183402&_x_ns_gid=605642815281510&_x_ads_channel=google&_x_gmc_account=5583678549&_x_login_type=Google&_x_ns_gg_lnk_type=adr&_x_ads_account=4059011744&_x_ads_set=23457371715&_x_ads_id=192115326416&_x_ads_creative_id=792851020744&_x_ns_source=g&_x_ns_gclid=CjwKCAjwxITRBhBYEiwA6mZm7TimmRANQYJ8Bvybwf5Ynqn1CSxy87Xod52LS4IYjHhJJflYtvkF_BoCcxMQAvD_BwE&_x_ns_placement=&_x_ns_match_type=&_x_ns_ad_position=&_x_ns_product_id=5583678549-95906888183402&_x_ns_target=&_x_ns_devicemodel=&_x_ns_wbraid=CkIKCQjwof_QBhD0ARIxAOdb5THuPAVwvBE1kQYt6xgk8gqQahdh4lTG_beLZv7xTdKToShS6qOB2HEr6c9PRBoC3FY&_x_ns_gbraid=0AAAAAo4mICEwJRAvC92FwUnWFZR7MQ1_W&_x_ns_targetid=pla-2461675360008&_x_ns_adg_trc=ta-c822_ffb6d6a4ebd4e8a38ed869628332f385ef65ce94518e92ff5e729e67c2d62dc9&_x_sessn_id=8wo4gf4g4o&refer_page_name=goods&refer_page_id=10032_1780648281776_8mpvitxnew) Soldering kit
 
