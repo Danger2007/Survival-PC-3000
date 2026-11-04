@@ -54,11 +54,9 @@
 
 -It detects radio signals
 
--It has a Document with survival tips (The courier's guide to the wasteland)
+-It doubles as an alarm clock
 
--It is also an alarm clock
-
--It runs a raspberry Pi OS (legacy 32-bit with desktop)
+-It runs a raspberry Pi OS (legacy 32-bit with desktop) with my OS [(Pip-Boy OS)](https://stardance.hackclub.com/projects/35444)
 
 ### PARTS NOT MINE:
 
